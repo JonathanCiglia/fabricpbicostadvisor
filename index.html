@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Fabric sizing & licensing cost advisor</title>
+  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+<body>
+<header>
+  <h1>Fabric sizing & PowerBI licensing cost advisor</h1>
+  <div class="sub">
+    📚 <a href="https://azure.microsoft.com/en-us/pricing/details/microsoft-fabric/" target="_blank">Official Fabric pricing page</a>
+    <br/> This tool helps to estimate whenever F64 or larger SKUs can reduce PowerBI Pro licensing costs by enabling free viewer licenses.
+    <br>Choosing a Fabric capacity goes beyond licensing costs: visit the <a href="https://www.microsoft.com/en-us/microsoft-fabric/capacity-estimator" target="_blank">Fabric Capacity Estimator</a> & the <a href="https://learn.microsoft.com/en-us/fabric/enterprise/powerbi/service-premium-what-is#semantic-model-sku-limitation" target="_blank">semantic model documentation in Fabric</a> for guidance.
+  </div>
+</header>
+
+<!-- Tabs Navigation -->
+<nav class="tabs-nav">
+  <button class="tab-button active" data-tab="estimator">Cost estimator</button>
+  <button class="tab-button" data-tab="licensing">License impact table</button>
+  <button class="tab-button" data-tab="features">Features comparison</button>
+</nav>
+
+<!-- Tab Content Container -->
+<div class="tab-content">
+  <!-- Estimator Tab -->
+  <div id="estimator-tab" class="tab-panel active">
+<main class="grid">
+  <!-- Left: Inputs -->
+  <section class="card">
+    <h2>Inputs</h2>
+
+    <div class="row">
+      <div>
+        <label>Currency</label>
+        <select id="currencySelect">
+          <option value="EUR">EUR (€)</option>
+          <option value="USD">USD ($)</option>
+          <option value="GBP">GBP (£)</option>
+          <option value="AUD">AUD (A$)</option>
+          <option value="CAD">CAD (C$)</option>
+          <option value="CHF">CHF (CHF)</option>
+          <option value="DKK">DKK (kr)</option>
+          <option value="SEK">SEK (kr)</option>
+          <option value="NOK">NOK (kr)</option>
+          <option value="JPY">JPY (¥)</option>
+          <option value="INR">INR (₹)</option>
+          <option value="SGD">SGD (S$)</option>
+          <option value="NZD">NZD (NZ$)</option>
+          <option value="BRL">BRL (R$)</option>
+          <option value="MXN">MXN (MX$)</option>
+          <option value="ZAR">ZAR (R)</option>
+          <option value="AED">AED (د.إ)</option>
+          <option value="SAR">SAR (﷼)</option>
+          <option value="TRY">TRY (₺)</option>
+          <option value="PLN">PLN (zł)</option>
+          <option value="CZK">CZK (Kč)</option>
+          <option value="HUF">HUF (Ft)</option>
+          <option value="ILS">ILS (₪)</option>
+        </select>
+      </div>
+      <div>
+        <label>Fabric <strong>Region </strong></label>
+        <input id="fabricRegion" type="text" value="North Europe" placeholder="ie: North Europe"/>
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Number of <strong>Viewers</strong></label>
+        <input id="viewerCount" type="integer" min="0" value="300" placeholder="1200" />
+      </div>
+      <div>
+        <label>Number of <strong>Builders</strong></label>
+        <input id="builderCount" type="integer" min="0" value="30" placeholder="30" />
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>PBI <strong>Pro</strong> <a href="https://www.microsoft.com/en-us/power-platform/products/power-bi#Pricing" target="_blank">cost per user / month</a></label>
+        <input id="proCost" type="integer" min="0" value="14" placeholder="14" />
+      </div>
+    </div>
+
+    <hr style="border: none; border-top: 1px solid var(--border); margin: 14px 0;" />
+
+    <h2>Fabric instances</h2>
+    <div class="muted">
+      Compare up to <strong>3</strong> instances.
+    </div>
+
+    <table class="table" id="capacityTable">
+      <thead>
+        <tr>
+          <th style="width:60%">Instance name</th>
+          <th style="width:35%">Monthly cost</th>
+          <th style="width:5%"></th>
+        </tr>
+      </thead>
+      <tbody id="capacityTbody"></tbody>
+    </table>
+    <div class="inline" style="margin-top:8px;">
+      <button class="btn" id="addCapacityBtn">+ Add instance</button>
+      <span class="muted" id="limitNote"></span>
+    </div>
+  </section>
+
+  <!-- Right: Results -->
+  <section class="card">
+    <div class="kpi hide" id="baselineBox">
+      <div class="box" style="background:#0b1322;border:1px solid var(--border);border-radius:10px;padding:10px;">
+        <h3 style="font-size:13px;margin:0 0 6px;color:#c7d2fe;">PPU only — Total / month</h3>
+        <div class="value" id="kpippuOnly" style="font-size:20px;font-weight:800;">—</div>
+        <div class="mini" id="kpippuOnlyDetail" style="color:var(--muted);font-size:12px;"></div>
+      </div>
+    </div>
+
+    <!-- Big Recommendation -->
+    <div class="rec" id="recommendation">
+      <div class="title">Recommendation</div>
+      <div class="big" id="recommendationMain">Add inputs to compute.</div>
+      <div class="mini" id="recommendationNote"></div>
+    </div>
+    &nbsp;
+    <div class="card" style="margin-top:12px;">
+      <h3 style="margin:0 0 9px;">Comparison table</h3>
+      <div id="comparisonTableWrap">Add capacity options (max 3) to see the table.</div>
+    </div>
+    <div class="muted" style="margin-top:8px;">
+      Note: Simplified model. Validate licensing/governance in your tenant, <a href="https://azure.microsoft.com/en-us/pricing/details/microsoft-fabric/" target="_blank">Fabric</a> and <a href="https://www.microsoft.com/en-us/power-platform/products/power-bi" target="_blank">PowerBI</a> pricing pages.
+      <br>This document is provided for informational purposes only and does not constitute a formal quotation.
+    </div>
+
+
+  <!-- Notes: accessible, collapsible, print-friendly -->
+  <section class="note-wrap" data-component="note">
+    <input type="checkbox" id="note-toggle" class="note-toggle" aria-controls="note-panel" />
+    <label for="note-toggle" class="note-label">Custom notes</label>
+    <div id="note-panel" class="note-panel" role="region" aria-labelledby="note-title">
+      <textarea class="note-input" placeholder="Type your note here..."></textarea>
+      <button type="button" class="note-clear" title="Clear note" aria-label="Clear note">Clear</button>
+  </section>
+    <div id="dateDiv" class="light-grey"></div>
+  </section>
+</main>
+
+<footer>
+  <div class="inline">
+    <button class="btn" id="resetBtn">Reset</button>
+    <button class="btn" id="sampleBtn">Load sample (F32/F64)</button>
+  </div>
+  <div class="inline">
+    <button class="btn-primary" id="printBtn">Save as PDF</button>
+  </div>
+</footer>
+</main>
+  </div>
+  
+  <!-- License Impact Tab -->
+  <div id="licensing-tab" class="tab-panel">
+    <main class="grid" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+      <section class="card" style="grid-column: 1 / -1;">
+        <h2>Fabric SKU vs PowerBI Licensing</h2>
+        <p class="muted">This table shows the licensing cost impact when moving from PowerBI Pro/PPU to different Fabric SKU sizes, based on estimated team size.</p>
+        <p class="muted">Note: This document is provided for informational purposes only and does not constitute a formal quotation
+        <br>Example values of "Capacity Cost" down below are based on a "West Europe" Fabric capacity pricing, as of October 2025.
+      </p>
+  <hr style="border: none; border-top: 1px solid var(--border); margin: 16px 0;" />
+        
+        <div class="row" style="margin-bottom: 20px; display: flex; gap: 32px; align-items: flex-end;">
+          <div>
+            <label>PowerBI <strong>Pro</strong> <a href="https://www.microsoft.com/en-us/power-platform/products/power-bi#Pricing" target="_blank">cost per user / month in $</a></label>
+            <input id="licenseTableProCost" type="number" min="0" value="14" placeholder="14" />
+          </div>
+          <div>
+            <label>PowerBI Premium Per User (PPU) <a href="https://www.microsoft.com/en-us/power-platform/products/power-bi#Pricing" target="_blank">cost per user / month in $</a></label>
+            <input id="licenseTablePpuCost" type="number" min="0" value="24" placeholder="24" />
+          </div>
+        </div>
+        
+        <!-- Prominent Reservation Option -->
+        <div style="background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(16, 185, 129, 0.05)); 
+                    border: 2px solid #10b981; 
+                    border-radius: 12px; 
+                    padding: 16px; 
+                    margin: 20px 0; 
+                    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);">
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+            <input type="checkbox" id="reservationDiscount" 
+         style="width: 18px; height: 18px; margin: 0; cursor: pointer; accent-color: #10b981;" checked />
+            <label for="reservationDiscount" style="margin: 0; font-size: 16px; font-weight: 600; cursor: pointer; color: #f3f4f6;">
+              🎯 Apply Fabric reservation discount
+            </label>
+            <span style="background: #2ecd98; color: white; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 700;">
+              SAVE COSTS
+            </span>
+          </div>
+          <div style="margin-left: 30px; color: #d1fae5; font-size: 13px; line-height: 1.4;">
+            💰 Get ~41% off all Fabric capacity costs with <a target="_blank" href="https://learn.microsoft.com/en-us/azure/cost-management-billing/reservations/fabric-capacity" style="color: #2ecd98; text-decoration: underline;">a 1-year commitment</a><br>
+            📈 Improves cost competitiveness vs PowerBI Pro/PPU licensing
+          </div>
+        </div>
+        
+        <!-- Table Display Options -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 15px 0;">
+          <div style="background: rgba(59, 130, 246, 0.1); 
+                      border: 1px solid #3b82f6; 
+                      border-radius: 8px; 
+                      padding: 12px; 
+                      position: relative;"
+               onmouseenter="showProTooltip()" 
+               onmouseleave="hideProTooltip()">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <input type="checkbox" id="hideProOnly" checked
+                     style="width: 16px; height: 16px; margin: 0; cursor: pointer; accent-color: #3b82f6;" />
+              <label for="hideProOnly" style="margin: 0; font-size: 14px; cursor: pointer; color: #f3f4f6;">
+                Hide "Pro Only" scenario
+              </label>
+            </div>
+            
+            <!-- Tooltip -->
+            <div id="proTooltip" style="
+              position: absolute;
+              top: 100%;
+              left: 0;
+              right: 0;
+              background: #1e293b;
+              border: 1px solid #475569;
+              border-radius: 8px;
+              padding: 12px;
+              margin-top: 8px;
+              font-size: 12px;
+              line-height: 1.4;
+              color: #e2e8f0;
+              display: none;
+              z-index: 1000;
+              box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+              <strong style="color: #fbbf24;">⚠️ Pro-only limitations:</strong><br>
+              • <strong>No premium features</strong> (dataflows, paginated reports, etc.)<br>
+              • <strong>Limited storage</strong> (10GB per user)<br>
+              • <strong>Limited model size</strong> (1 GB)
+            </div>
+          </div>
+          
+          <div style="background: rgba(168, 85, 247, 0.1); 
+                      border: 1px solid #a855f7; 
+                      border-radius: 8px; 
+                      padding: 12px; 
+                      position: relative;"
+               onmouseenter="showPpuTooltip()" 
+               onmouseleave="hidePpuTooltip()">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <input type="checkbox" id="hidePpuOnly"
+                     style="width: 16px; height: 16px; margin: 0; cursor: pointer; accent-color: #a855f7;" />
+              <label for="hidePpuOnly" style="margin: 0; font-size: 14px; cursor: pointer; color: #f3f4f6;">
+                Hide "PPU Only" scenario
+              </label>
+            </div>
+          </div>
+        </div>
+        
+        <div id="licenseImpactTable"></div>
+        
+        <!-- Sliders for custom scenario -->
+        <div class="row" style="margin-top: 30px; padding: 20px; background: rgba(59, 130, 246, 0.1); border-radius: 8px;">
+          <div style="width: 100%;">
+            <h3 style="margin: 0 0 20px; color: #f3f4f6;">Custom Scenario Builder</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+              <div>
+                <label for="viewersSlider" style="display: block; margin-bottom: 8px; font-weight: 600;">
+                  Viewers: <span id="viewersCount" style="color: #3b82f6;">300</span>
+                </label>
+                <input type="range" id="viewersSlider" min="0" max="2000" step="1" value="300" 
+                       style="width: 100%; height: 6px; border-radius: 3px; background: #374151; outline: none; cursor: pointer;">
+              </div>
+              <div>
+                <label for="buildersSlider" style="display: block; margin-bottom: 8px; font-weight: 600;">
+                  Builders: <span id="buildersCount" style="color: #10b981;">30</span>
+                </label>
+                <input type="range" id="buildersSlider" min="0" max="200" step="5" value="30" 
+                       style="width: 100%; height: 6px; border-radius: 3px; background: #374151; outline: none; cursor: pointer;">
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+  
+  <!-- Feature Comparison Tab -->
+  <div id="features-tab" class="tab-panel">
+    <main class="grid" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+      <section class="card" style="grid-column: 1 / -1;">
+        <h2>Feature Comparison: Power BI Pro vs Premium Per User vs Fabric Capacity</h2>
+        <p class="muted">Compare key features and capabilities across different Power BI licensing options to make an informed decision for your organization.</p>
+        
+        <div style="overflow-x: auto; margin-top: 20px;">
+          <table class="table" style="font-size: 13px;">
+            <thead>
+              <tr style="background: var(--panel);">
+                <th style="width: 40%; text-align: left; padding: 12px 8px;">Feature</th>
+                <th style="width: 20%; text-align: center; color: #3b82f6; border-left: 1px solid var(--border);">Power BI Pro</th>
+                <th style="width: 20%; text-align: center; color: #a855f7; border-left: 1px solid var(--border);">Premium Per User (PPU)</th>
+                <th style="width: 20%; text-align: center; color: #10b981; border-left: 1px solid var(--border);">Fabric Capacity</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Authoring & Collaboration -->
+              <tr style="background: rgba(96, 165, 250, 0.05);">
+                <td colspan="4" style="font-weight: 600; color: #dbeafe; padding: 8px;">📊 Authoring & Collaboration</td>
+              </tr>
+              <tr>
+                <td>Create and edit reports</td>
+                <td style="text-align: center; color: #22c55e;">✅</td>
+                <td style="text-align: center; color: #22c55e;">✅</td>
+                <td style="text-align: center; color: #22c55e;">✅</td>
+              </tr>
+              <tr>
+                <td>Copilot</td>
+                <td style="text-align: center; color: #ef4444;">❌</td>
+                <td style="text-align: center; color: #ef4444;">❌</td>
+                <td style="text-align: center; color: #22c55e;">✅</td>
+              </tr>
+              
+              <!-- Data & Models -->
+              <tr style="background: rgba(96, 165, 250, 0.05);">
+                <td colspan="4" style="font-weight: 600; color: #dbeafe; padding: 8px;">🗄️ Data & Models</td>
+              </tr>
+              <tr>
+                <td>Dataset size limit</td>
+                <td style="text-align: center;">1 GB</td>
+                <td style="text-align: center; color: #10b981;">100 GB</td>
+                <td style="text-align: center; color: #10b981;">up to 400 GB</td>
+              </tr>
+              <tr>
+                <td>Data refresh frequency</td>
+                <td style="text-align: center;">8x daily</td>
+                <td style="text-align: center; color: #10b981;">48x daily</td>
+                <td style="text-align: center; color: #10b981;">48x daily</td>
+              </tr>
+              <tr>
+                <td>OneLake storage</td>
+                <td style="text-align: center; color: #ef4444;">❌</td>
+                <td style="text-align: center; color: #ef4444;">❌</td>
+                <td style="text-align: center; color: #22c55e;">✅</td>
+              </tr>
+              <tr>
+                <td>Incremental refresh</td>
+                <td style="text-align: center; color: #ef4444;">❌</td>
+                <td style="text-align: center; color: #22c55e;">✅</td>
+                <td style="text-align: center; color: #22c55e;">✅</td>
+              </tr>
+              <tr>
+                <td>XMLA endpoint (read/write)</td>
+                <td style="text-align: center; color: #ef4444;">❌</td>
+                <td style="text-align: center; color: #22c55e;">✅</td>
+                <td style="text-align: center; color: #22c55e;">✅</td>
+              </tr>
+              <!-- Advanced Analytics -->
+              <tr style="background: rgba(96, 165, 250, 0.05);">
+                <td colspan="4" style="font-weight: 600; color: #dbeafe; padding: 8px;">🔬 Advanced Analytics</td>
+              </tr>
+              <tr>
+                <td>AI visuals (Key Influencers, etc.)</td>
+                <td style="text-align: center; color: #22c55e;">⚠️ except <a target="_blank" href="https://learn.microsoft.com/en-us/power-bi/create-reports/copilot-create-narrative?tabs=powerbi-service">narratives</a></td>
+                <td style="text-align: center; color: #22c55e;">⚠️ except <a target="_blank" href="https://learn.microsoft.com/en-us/power-bi/create-reports/copilot-create-narrative?tabs=powerbi-service">narratives</a></td>
+                <td style="text-align: center; color: #22c55e;">✅</td>
+              </tr>
+              <tr>
+                <td>Dataflows</td>
+                <td style="text-align: center; color: #ef4444;">❌</td>
+                <td style="text-align: center; color: #22c55e;">⚠️ <a target="_blank" href="https://learn.microsoft.com/en-us/fabric/data-factory/dataflows-gen2-overview#dataflow-features">Gen1 only</a></td>
+                <td style="text-align: center; color: #22c55e;">✅</td>
+              </tr>
+              <tr>
+                <td>Paginated reports</td>
+                <td style="text-align: center; color: #ef4444;">❌</td>
+                <td style="text-align: center; color: #22c55e;">✅</td>
+                <td style="text-align: center; color: #22c55e;">✅</td>
+              </tr>
+              <tr>
+                <td>Deployment pipelines</td>
+                <td style="text-align: center; color: #ef4444;">❌</td>
+                <td style="text-align: center; color: #22c55e;">✅</td>
+                <td style="text-align: center; color: #22c55e;">✅</td>
+              </tr>
+              
+              <!-- Fabric Integration -->
+              <tr style="background: rgba(96, 165, 250, 0.05);">
+                <td colspan="4" style="font-weight: 600; color: #dbeafe; padding: 8px;">⚡ Microsoft Fabric Integration</td>
+              </tr>
+              <tr>
+                <td>Data Factory (pipelines)</td>
+                <td style="text-align: center; color: #ef4444;">❌</td>
+                <td style="text-align: center; color: #ef4444;">❌</td>
+                <td style="text-align: center; color: #22c55e;">✅</td>
+              </tr>
+              <tr>
+                <td>Synapse Data Engineering</td>
+                <td style="text-align: center; color: #ef4444;">❌</td>
+                <td style="text-align: center; color: #ef4444;">❌</td>
+                <td style="text-align: center; color: #22c55e;">✅</td>
+              </tr>
+              <tr>
+                <td>Real-Time Analytics</td>
+                <td style="text-align: center; color: #ef4444;">❌</td>
+                <td style="text-align: center; color: #ef4444;">❌</td>
+                <td style="text-align: center; color: #22c55e;">✅</td>
+              </tr>
+              <tr>
+                <td>Data Lakehouse & Warehouse</td>
+                <td style="text-align: center; color: #ef4444;">❌</td>
+                <td style="text-align: center; color: #ef4444;">❌</td>
+                <td style="text-align: center; color: #22c55e;">✅</td>
+              </tr>
+              
+              <!-- Governance & Security -->
+              <tr style="background: rgba(96, 165, 250, 0.05);">
+                <td colspan="4" style="font-weight: 600; color: #dbeafe; padding: 8px;">🔒 Governance & Security</td>
+              </tr>
+              <tr>
+                <td>Row-level security (RLS)</td>
+                <td style="text-align: center; color: #22c55e;">✅</td>
+                <td style="text-align: center; color: #22c55e;">✅</td>
+                <td style="text-align: center; color: #22c55e;">✅</td>
+              </tr>
+              <tr>
+                <td>Multi-geo deployment</td>
+                <td style="text-align: center; color: #ef4444;">❌</td>
+                <td style="text-align: center; color: #ef4444;">❌</td>
+                <td style="text-align: center; color: #22c55e;">✅</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <div class="muted" style="margin-top: 20px; font-size: 12px;">
+          <strong>Key Takeaways:</strong><br>
+          • <span style="color: #3b82f6;">Power BI Pro</span>: Best for basic reporting and collaboration with Pro users<br>
+          • <span style="color: #a855f7;">Premium Per User (PPU)</span>: Adds enterprise features like large models and more refresh<br>
+          • <span style="color: #10b981;">Fabric Capacity</span>: Complete data platform with free viewer access (F64+) and integrated analytics<br><br>
+          <em>Features may vary by SKU size and region. Always verify current capabilities with Microsoft documentation.</em>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<script>
+(() => {
+  const wrap = document.querySelector('.note-wrap');
+  if (!wrap) return;
+
+  const toggle = wrap.querySelector('#note-toggle');
+  const input  = wrap.querySelector('.note-input');
+  const clear  = wrap.querySelector('.note-clear');
+
+  const KEY_NOTE   = 'advisor-note:text';
+  const KEY_TOGGLE = 'advisor-note:open';
+
+  // restore state
+  try {
+    const savedText = localStorage.getItem(KEY_NOTE);
+    if (savedText !== null) input.value = savedText;
+
+    const open = localStorage.getItem(KEY_TOGGLE);
+    if (open === '1') toggle.checked = true;
+  } catch {}
+
+  // persist on input / toggle
+  input?.addEventListener('input', () => {
+    try { localStorage.setItem(KEY_NOTE, input.value); } catch {}
+  });
+  toggle?.addEventListener('change', () => {
+    try { localStorage.setItem(KEY_TOGGLE, toggle.checked ? '1' : '0'); } catch {}
+  });
+
+  // clear button
+  clear?.addEventListener('click', () => {
+    input.value = '';
+    try { localStorage.removeItem(KEY_NOTE); } catch {}
+    input.focus();
+  });
+})();
+
+
+  // --- State ---
+  const state = {
+    currencyCode: "EUR",
+    currencySymbol: "€",
+    viewers: 300,
+    builders: 30,
+    proCost: 14,
+    capacities: [], // { id, name, monthlyCost }
+    maxInstances: 3
+  };
+
+  // Currency map (common Azure pricing currencies)
+  const currencyMap = {
+    "EUR": "€","USD": "$","GBP": "£","AUD": "A$","CAD": "C$","CHF": "CHF",
+    "DKK": "kr","SEK": "kr","NOK": "kr","JPY": "¥","INR": "₹","SGD": "S$",
+    "NZD": "NZ$","BRL": "R$","MXN": "MX$","ZAR": "R","AED": "د.إ","SAR": "﷼",
+    "TRY": "₺","PLN": "zł","CZK": "Kč","HUF": "Ft","ILS": "₪"
+  };
+
+  // --- Helpers ---
+  const fmt = (v) => Number.isFinite(v) ? v.toLocaleString(undefined, {maximumFractionDigits: 2}) : "—";
+  const money = (v) => `${state.currencySymbol}${fmt(v || 0)}`;
+  const byId = (id) => document.getElementById(id);
+
+  // Extract F number from instance name: "F32" -> 32
+  function getFSkuNumber(name) {
+    const m = String(name || "").match(/f\s*(\d+)/i);
+    return m ? parseInt(m[1], 10) : null;
+  }
+  // Viewer rule: Pro on F32-; Free on F64+; unknown => Pro
+  function viewerUnitCost(name) {
+    const f = getFSkuNumber(name);
+    if (Number.isInteger(f)) {
+      if (f >= 64) return 0;
+      if (f > 0 && f <= 32) return state.proCost;
+    }
+    return state.proCost;
+  }
+
+  function computePpuOnly() {
+    const totalUsers = state.viewers + state.builders;
+    const total = totalUsers * state.proCost;
+    return { total, detail: `${totalUsers} × PPU @ ${money(state.proCost)}` };
+  }
+
+  function computeCapacityTotals() {
+    return state.capacities
+      .slice(0, state.maxInstances)
+      .map(c => {
+        const vUnit = viewerUnitCost(c.name);
+        const cap = c.monthlyCost || 0;
+        const buildersCost = state.builders * state.proCost;
+        const viewersCost = state.viewers * vUnit;
+        const total = cap + buildersCost + viewersCost;
+        return {
+          id: c.id,
+          name: c.name || "(unnamed)",
+          monthlyCost: cap,
+          viewerUnitCost: vUnit,
+          buildersCost,
+          viewersCost,
+          total
+        };
+      });
+  }
+
+  function renderComparisonTable(caps, ppuOnly) {
+    const wrap = byId("comparisonTableWrap");
+    wrap.innerHTML = "";
+
+    const allRows = [
+      ...caps.map(c => ({
+        label: c.name,
+        policy: c.viewerUnitCost === 0 ? "Free viewers" : "Viewers & builders require Pro ",
+        capCost: c.monthlyCost,
+        buildersCost: c.buildersCost,
+        viewersCost: c.viewersCost,
+        total: c.total
+      }))
+    ];
+
+    const bestRow = allRows.reduce((a, b) => (b.total < a.total ? b : a), allRows[0]);
+
+    const tbl = document.createElement("table");
+    tbl.className = "table";
+    tbl.innerHTML = `
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Viewer Policy</th>
+          <th class="right">Capacity</th>
+          <th class="right">Builders</th>
+          <th class="right">Viewers</th>
+          <th class="right">Total / month</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    `;
+    const tbody = tbl.querySelector("tbody");
+
+    allRows.forEach(row => {
+      const tr = document.createElement("tr");
+      if (row === bestRow) tr.classList.add("best-row");
+      const delta = row.total - ppuOnly.total;
+      tr.innerHTML = `
+        <td>${row.label} ${row === bestRow ? `<span class="best-badge">Best</span>` : ""}</td>
+        <td>${row.policy}</td>
+        <td class="right">${money(row.capCost)}</td>
+        <td class="right">${money(row.buildersCost)}</td>
+        <td class="right">${money(row.viewersCost)}</td>
+        <td class="right"><strong>${money(row.total)}</strong></td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    wrap.appendChild(tbl);
+  }
+
+  function updateRecommendation(caps, ppuOnly) {
+    const candidates = [...caps.map(x => ({ label: `${x.name}`, total: x.total }))];
+    const best = candidates.length > 0 ? candidates.reduce((a, b) => (b.total < a.total ? b : a)) : undefined;
+    const worst = candidates.length > 0 ? candidates.reduce((a, b) => (b.total > a.total ? b : a)) : undefined;
+    byId("recommendationMain").textContent = best ? `${best.label} — ${money(best.total * 12)} / year` : 'Add capacities to see a recommendation';
+  }
+
+  function updateKPIs() {
+    const ppuOnly = computePpuOnly();
+    byId("kpippuOnly").textContent = money(ppuOnly.total);
+    byId("kpippuOnlyDetail").textContent = ppuOnly.detail;
+
+    const caps = computeCapacityTotals();
+    renderComparisonTable(caps, ppuOnly);
+    updateRecommendation(caps, ppuOnly);
+
+    const limitNote = byId("limitNote");
+    if (state.capacities.length >= state.maxInstances) {
+      limitNote.textContent = `Limit reached (${state.maxInstances} instances). Remove one to add another.`;
+    } else {
+      limitNote.textContent = "";
+    }
+  }
+
+  // --- UI Wiring ---
+  function readInputs() {
+    state.currencyCode = byId("currencySelect").value;
+    state.currencySymbol = currencyMap[state.currencyCode] || "€";
+    state.viewers = Number(byId("viewerCount").value) || 0;
+    state.builders = Number(byId("builderCount").value) || 0;
+    state.proCost = Number(byId("proCost").value) || 0;
+    updateKPIs();
+  }
+  ["currencySelect","viewerCount","builderCount","proCost"]
+    .forEach(id => byId(id).addEventListener("input", readInputs));
+
+  const tbody = byId("capacityTbody");
+  let capIdCounter = 1;
+
+  function updateAddButtonState() {
+    const addBtn = byId("addCapacityBtn");
+    addBtn.disabled = state.capacities.length >= state.maxInstances;
+  }
+
+  function addCapacityRow(name = "", monthlyCost = "") {
+    if (state.capacities.length >= state.maxInstances) {
+      updateAddButtonState();
+      updateKPIs();
+      return;
+    }
+
+    const fabricSKUs = [
+      "F2", "F4", "F8", "F16", "F32", "F64", "F128", "F256", "F512", "F1024", "F2048"
+    ];
+    const selectedSKU = fabricSKUs.includes(name) ? name : fabricSKUs[0];  
+    const options = fabricSKUs.map(
+      sku => `<option value="${sku}"${sku === selectedSKU ? " selected" : ""}>${sku}</option>`
+    ).join("");
+
+
+    const id = capIdCounter++;
+    const row = document.createElement("tr");
+    row.dataset.id = id;
+
+    state.capacities.push({ id, name: selectedSKU, monthlyCost: Number(monthlyCost) || 0 });
+
+    row.innerHTML = `
+      <td><select>${options}</select></td>
+      <td><input type="integer" min="0" placeholder="0.0" value="${monthlyCost}" /></td>
+      <td class="right"><button class="del">Remove</button></td>
+    `;
+
+    const [skuSelect, costInput, delBtn] = row.querySelectorAll("select, input, button");
+    skuSelect.addEventListener("change", () => {
+      const cap = state.capacities.find(c => c.id === id);
+      if (cap) cap.name = skuSelect.value;
+      updateKPIs();
+    });
+    costInput.addEventListener("input", () => {
+      const cap = state.capacities.find(c => c.id === id);
+      if (cap) cap.monthlyCost = parseInt(costInput.value) || 0;
+      updateKPIs();
+    });
+    delBtn.addEventListener("click", () => {
+      tbody.removeChild(row);
+      const idx = state.capacities.findIndex(c => c.id === id);
+      if (idx >= 0) state.capacities.splice(idx, 1);
+      updateAddButtonState();
+      updateKPIs();
+    });
+
+    tbody.appendChild(row);
+    updateAddButtonState();
+    updateKPIs();
+  }
+  
+  byId("addCapacityBtn").addEventListener("click", () => addCapacityRow());
+
+  // Footer actions
+  byId("resetBtn").addEventListener("click", () => {
+    byId("currencySelect").value = "EUR";
+    byId("viewerCount").value = 0;
+    byId("builderCount").value = 0;
+    byId("proCost").value = 0;
+    byId("fabricRegion").value = "";
+    byId("recommendationMain").textContent = "";
+    state.currencyCode = "EUR";
+    state.currencySymbol = currencyMap["EUR"];
+
+    state.capacities = [];
+    tbody.innerHTML = "";
+    updateKPIs();
+
+    // Ensure baseline hidden again
+    const box = byId("baselineBox");
+    if (!box.classList.contains("hide")) box.classList.add("hide");
+  });
+
+  byId("sampleBtn").addEventListener("click", () => {
+    byId("currencySelect").value = "EUR";
+    byId("viewerCount").value = 1200;
+    byId("builderCount").value = 25;
+    byId("proCost").value = 14;
+    byId("fabricRegion").value = "North Europe";
+
+    // Clear existing capacities
+    state.capacities = [];
+    tbody.innerHTML = "";
+    
+    // Add sample capacities
+    addCapacityRow("F32", "2640");
+    addCapacityRow("F64", "5280");
+    
+    // Read form inputs to update state, then update KPIs
+    readInputs();
+
+    const box = byId("baselineBox");
+    if (!box.classList.contains("hide")) box.classList.add("hide");
+  });
+
+  byId("printBtn").addEventListener("click", () => window.print());
+
+  // --- Init defaults ---
+  // Set form values to match initial state
+  byId("currencySelect").value = state.currencyCode;
+  byId("viewerCount").value = state.viewers;
+  byId("builderCount").value = state.builders;
+  byId("proCost").value = state.proCost;
+  
+  addCapacityRow("F32", "2640");
+  addCapacityRow("F64", "5280");
+  updateKPIs();
+
+
+  // Get today's date and format it as YYYY-MM-DD
+  const today = new Date();
+  // Example format: October 16, 2025
+  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  document.getElementById('dateDiv').textContent = "Generated the: " + today.toLocaleDateString(undefined, options);
+
+  // === TAB FUNCTIONALITY ===
+  function initTabs() {
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabPanels = document.querySelectorAll('.tab-panel');
+
+    tabButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const targetTab = button.dataset.tab;
+        
+        // Remove active class from all buttons and panels
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        tabPanels.forEach(panel => panel.classList.remove('active'));
+        
+        // Add active class to clicked button and corresponding panel
+        button.classList.add('active');
+        document.getElementById(`${targetTab}-tab`).classList.add('active');
+        
+        // Generate license impact table when switching to licensing tab
+        if (targetTab === 'licensing') {
+          generateLicenseImpactTable();
+        }
+      });
+    });
+  }
+
+  // === LICENSE IMPACT TABLE ===
+  function generateLicenseImpactTable() {
+     const tableContainer = document.getElementById('licenseImpactTable');
+     const proCost = parseFloat(document.getElementById('licenseTableProCost').value) || 14;
+     const ppuCost = parseFloat(document.getElementById('licenseTablePpuCost').value) || 24;
+     const reservationDiscount = document.getElementById('reservationDiscount').checked;
+     const hideProOnly = document.getElementById('hideProOnly').checked;
+     const hidePpuOnly = document.getElementById('hidePpuOnly').checked;
+     const symbol = '$'; // Fixed to USD
+
+    // Updated Fabric SKU pricing based on official USD pricing
+    const fabricSKUs = [
+      { name: 'F8', monthlyCost: 1285, reservationCost: 764, viewerPolicy: 'Pro required', computeUnits: 8 },
+      { name: 'F16', monthlyCost: 2570, reservationCost: 1528, viewerPolicy: 'Pro required', computeUnits: 16 },
+      { name: 'F32', monthlyCost: 5139, reservationCost: 3056, viewerPolicy: 'Pro required', computeUnits: 32 },
+      { name: 'F64', monthlyCost: 10278, reservationCost: 6112, viewerPolicy: 'Free viewers', computeUnits: 64 },
+      { name: 'F128', monthlyCost: 20557, reservationCost: 12224, viewerPolicy: 'Free viewers', computeUnits: 128 },
+      { name: 'F256', monthlyCost: 41114, reservationCost: 24448, viewerPolicy: 'Free viewers', computeUnits: 256 }
+    ].map(sku => ({
+      ...sku,
+      // Use reservation cost if enabled, otherwise use pay-as-you-go cost
+      monthlyCost: reservationDiscount ? sku.reservationCost : sku.monthlyCost,
+      originalCost: sku.monthlyCost
+    }));
+
+    // Get custom scenario from sliders
+    const viewersCount = parseInt(document.getElementById('viewersSlider').value);
+    const buildersCount = parseInt(document.getElementById('buildersSlider').value);
+    const scenario = { viewers: viewersCount, builders: buildersCount, name: 'Custom Scenario' };
+
+    let html = '<div style="overflow-x: auto;">';
+    
+    // Single table for custom scenario
+    const proOnlyTotal = (scenario.viewers + scenario.builders) * proCost;
+    const ppuOnlyTotal = (scenario.viewers + scenario.builders) * ppuCost;
+    
+    html += `
+      <h3>${scenario.viewers} viewers + ${scenario.builders} builders</h3>
+      <table class="table" style="margin-bottom: 30px;">
+        <thead>
+          <tr>
+            <th>Option</th>
+            <th>Viewer Policy</th>
+            <th class="right">Capacity Cost</th>
+            <th class="right">Builder Licenses</th>
+            <th class="right">Viewer Licenses</th>
+            <th class="right">Total Monthly</th>
+            ${!hideProOnly ? '<th class="right">vs Pro Only</th>' : ''}
+            ${!hidePpuOnly ? '<th class="right">vs PPU Only</th>' : ''}
+          </tr>
+        </thead>
+        <tbody>
+    `;
+    
+    // Pro Only baseline row (conditional)
+    if (!hideProOnly) {
+      html += `
+        <tr style="background: rgba(59, 130, 246, 0.1); border: 1px solid #3b82f6;">
+          <td><strong>Pro Only</strong></td>
+          <td>All users have Pro</td>
+          <td class="right">—</td>
+          <td class="right">${symbol}${Math.round(scenario.builders * proCost).toLocaleString()}</td>
+          <td class="right">${symbol}${Math.round(scenario.viewers * proCost).toLocaleString()}</td>
+          <td class="right"><strong>${symbol}${Math.round(proOnlyTotal).toLocaleString()}</strong></td>
+          <td class="right">—</td>
+          ${!hidePpuOnly ? `<td class="right">${symbol}${Math.round(Math.abs(proOnlyTotal - ppuOnlyTotal)).toLocaleString()} ${proOnlyTotal < ppuOnlyTotal ? '✅' : '❌'}</td>` : ''}
+        </tr>
+      `;
+    }
+    
+    // PPU Only baseline row (conditional)
+    if (!hidePpuOnly) {
+      html += `
+        <tr style="background: rgba(168, 85, 247, 0.1); border: 1px solid #a855f7;">
+          <td><strong>PPU Only</strong></td>
+          <td>All users need PPU</td>
+          <td class="right">—</td>
+          <td class="right">${symbol}${Math.round(scenario.builders * ppuCost).toLocaleString()}</td>
+          <td class="right">${symbol}${Math.round(scenario.viewers * ppuCost).toLocaleString()}</td>
+          <td class="right"><strong>${symbol}${Math.round(ppuOnlyTotal).toLocaleString()}</strong></td>
+          ${!hideProOnly ? `<td class="right">${symbol}${Math.round(Math.abs(ppuOnlyTotal - proOnlyTotal)).toLocaleString()} ${ppuOnlyTotal < proOnlyTotal ? '✅' : '❌'}</td>` : ''}
+          <td class="right">—</td>
+        </tr>
+      `;
+    }
+    
+    fabricSKUs.forEach(sku => {
+      const builderCost = scenario.builders * proCost;
+      const viewerCost = sku.viewerPolicy === 'Free viewers' ? 0 : scenario.viewers * proCost;
+      const totalCost = sku.monthlyCost + builderCost + viewerCost;
+      const vsProSavings = proOnlyTotal - totalCost;
+      const vsPpuSavings = ppuOnlyTotal - totalCost;
+      const vsProPercent = Math.round((vsProSavings / proOnlyTotal) * 100);
+      const vsPpuPercent = Math.round((vsPpuSavings / ppuOnlyTotal) * 100);
+      
+      const isF64 = sku.name === 'F64';
+      const showComparison = scenario.viewers > 0 || scenario.builders > 0;
+      
+      html += `
+        <tr${isF64 ? ' style="background-color: rgba(34, 197, 94, 0.1);"' : ''}>
+          <td>Fabric ${sku.name}</td>
+          <td>${sku.viewerPolicy}</td>
+          <td class="right">${symbol}${Math.round(sku.monthlyCost).toLocaleString()}${reservationDiscount ? ' <span style="color: #22c55e; font-size: 10px;">(~41% off)</span>' : ''}</td>
+          <td class="right">${symbol}${Math.round(builderCost).toLocaleString()}</td>
+          <td class="right">${symbol}${Math.round(viewerCost).toLocaleString()}</td>
+          <td class="right"><strong>${symbol}${Math.round(totalCost).toLocaleString()}</strong></td>
+          ${!hideProOnly ? `<td class="right">${showComparison ? (vsProSavings > 0 ? '-' : '+') + symbol + Math.round(Math.abs(vsProSavings)).toLocaleString() + ' ' + (vsProSavings > 0 ? '✅' : '') + ' (' + vsProPercent + '%)' : '—'}</td>` : ''}
+          ${!hidePpuOnly ? `<td class="right">${showComparison ? (vsPpuSavings > 0 ? '-' : '+') + symbol + Math.round(Math.abs(vsPpuSavings)).toLocaleString() + ' ' + (vsPpuSavings > 0 ? '✅' : '') + ' (' + vsPpuPercent + '%)' : '—'}</td>` : ''}
+        </tr>
+      `;
+    });
+    
+    html += '</tbody></table></div>';
+    tableContainer.innerHTML = html;
+  }
+
+  // === TOOLTIP FUNCTIONS ===
+  function showProTooltip() {
+    document.getElementById('proTooltip').style.display = 'block';
+  }
+  
+  function hideProTooltip() {
+    document.getElementById('proTooltip').style.display = 'none';
+  }
+
+  function showPpuTooltip() {
+    document.getElementById('ppuTooltip').style.display = 'block';
+  }
+  
+  function hidePpuTooltip() {
+    document.getElementById('ppuTooltip').style.display = 'none';
+  }
+
+  // Initialize tabs
+  initTabs();
+  
+  // Add event listeners for license table inputs
+  document.getElementById('licenseTableProCost').addEventListener('input', generateLicenseImpactTable);
+  document.getElementById('licenseTablePpuCost').addEventListener('input', generateLicenseImpactTable);
+  document.getElementById('reservationDiscount').addEventListener('change', generateLicenseImpactTable);
+  document.getElementById('hideProOnly').addEventListener('change', generateLicenseImpactTable);
+  document.getElementById('hidePpuOnly').addEventListener('change', generateLicenseImpactTable);
+  
+  // Add slider event listeners
+  const viewersSlider = document.getElementById('viewersSlider');
+  const buildersSlider = document.getElementById('buildersSlider');
+  const viewersCount = document.getElementById('viewersCount');
+  const buildersCount = document.getElementById('buildersCount');
+  
+  // Function to snap viewers to correct increment (25 by 25 until 200, then 50 by 50)
+  function snapViewersValue(value) {
+    const numValue = parseInt(value);
+    if (numValue <= 200) {
+      // Snap to nearest 25
+      return Math.round(numValue / 25) * 25;
+    } else {
+      // Snap to nearest 50
+      return Math.round(numValue / 50) * 50;
+    }
+  }
+  
+  viewersSlider.addEventListener('input', function() {
+    const snappedValue = snapViewersValue(this.value);
+    this.value = snappedValue;
+    viewersCount.textContent = snappedValue;
+    generateLicenseImpactTable();
+  });
+  
+  buildersSlider.addEventListener('input', function() {
+    buildersCount.textContent = this.value;
+    generateLicenseImpactTable();
+  });
+
+</script>
+</body>
+</html>
