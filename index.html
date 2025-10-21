@@ -20,6 +20,7 @@
 <nav class="tabs-nav">
   <button class="tab-button active" data-tab="estimator">Cost estimator</button>
   <button class="tab-button" data-tab="licensing">License impact table</button>
+  <button class="tab-button" data-tab="migration">P to F Migration</button>
   <button class="tab-button" data-tab="features">Features comparison</button>
 </nav>
 
@@ -140,7 +141,7 @@
     <input type="checkbox" id="note-toggle" class="note-toggle" aria-controls="note-panel" />
     <label for="note-toggle" class="note-label">Custom notes</label>
     <div id="note-panel" class="note-panel" role="region" aria-labelledby="note-title">
-      <textarea class="note-input" placeholder="Type your note here..."></textarea>
+      <textarea class="note-input" placeholder="Type notes here..."></textarea>
       <button type="button" class="note-clear" title="Clear note" aria-label="Clear note">Clear</button>
   </section>
     <div id="dateDiv" class="light-grey"></div>
@@ -285,6 +286,117 @@
               </div>
             </div>
           </div>
+        </div>
+      </section>
+    </main>
+  </div>
+  
+  <!-- P to F Migration Tab -->
+  <div id="migration-tab" class="tab-panel">
+    <main class="grid" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+      <section class="card" style="grid-column: 1 / -1;">
+        <h2>From Power BI Premium to Microsoft Fabric: Choosing the Right F-SKU</h2>
+        <p class="muted">This visual guide shows a possible migration path from Power BI Premium SKUs to Microsoft Fabric SKUs.</p>
+        
+        <!-- Migration Visualization -->
+        <div style="margin: 40px 0; position: relative; min-height: 500px; overflow: hidden;">
+          <!-- Left Circle - Power BI Premium -->
+          <div style="position: absolute; left: 50px; top: 50%; transform: translateY(-50%); width: 280px; height: 280px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 32px rgba(245, 158, 11, 0.3); z-index: 1;">
+            <div style="text-align: center; color: white;">
+              <div style="font-size: 48px; margin-bottom: 10px;">📊</div>
+              <div style="font-size: 20px; font-weight: 700;">Power BI</div>
+              <div style="font-size: 18px; font-weight: 600;">Premium SKU</div>
+            </div>
+          </div>
+          
+          <!-- Right Circle - Microsoft Fabric -->
+          <div style="position: absolute; right: 50px; top: 50%; transform: translateY(-50%); width: 280px; height: 280px; border-radius: 50%; background: linear-gradient(135deg, #10b981 0%, #059669 100%); display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 32px rgba(16, 185, 129, 0.3); z-index: 1;">
+            <div style="text-align: center; color: white;">
+              <div style="font-size: 48px; margin-bottom: 10px;">⚡</div>
+              <div style="font-size: 20px; font-weight: 700;">Microsoft</div>
+              <div style="font-size: 18px; font-weight: 600;">Fabric SKU</div>
+            </div>
+          </div>
+          
+          <!-- Migration Paths Container -->
+          <div style="position: absolute; left: 340px; right: 340px; top: 0; bottom: 0; display: flex; flex-direction: column; justify-content: space-around; padding: 20px 0;">
+            
+            <!-- EM to F mappings -->
+            <div class="migration-row" style="display: flex; align-items: center; justify-content: space-between; margin: 8px 0;">
+              <div class="sku-badge" style="background: rgba(245, 158, 11, 0.15); border: 2px solid #f59e0b; color: #f59e0b; padding: 8px 16px; border-radius: 20px; font-weight: 600; min-width: 60px; text-align: center;">EM</div>
+              <div style="flex: 1; height: 2px; background: linear-gradient(to right, #f59e0b, #10b981); margin: 0 10px; position: relative;">
+                <div style="position: absolute; right: -6px; top: -4px; width: 0; height: 0; border-left: 8px solid #10b981; border-top: 5px solid transparent; border-bottom: 5px solid transparent;"></div>
+              </div>
+              <div class="sku-badge" style="background: rgba(16, 185, 129, 0.15); border: 2px solid #10b981; color: #10b981; padding: 8px 16px; border-radius: 20px; font-weight: 600; min-width: 60px; text-align: center;">F8</div>
+            </div>
+            
+            <div class="migration-row" style="display: flex; align-items: center; justify-content: space-between; margin: 8px 0;">
+              <div class="sku-badge" style="background: rgba(245, 158, 11, 0.15); border: 2px solid #f59e0b; color: #f59e0b; padding: 8px 16px; border-radius: 20px; font-weight: 600; min-width: 60px; text-align: center;">EM2</div>
+              <div style="flex: 1; height: 2px; background: linear-gradient(to right, #f59e0b, #10b981); margin: 0 10px; position: relative;">
+                <div style="position: absolute; right: -6px; top: -4px; width: 0; height: 0; border-left: 8px solid #10b981; border-top: 5px solid transparent; border-bottom: 5px solid transparent;"></div>
+              </div>
+              <div class="sku-badge" style="background: rgba(16, 185, 129, 0.15); border: 2px solid #10b981; color: #10b981; padding: 8px 16px; border-radius: 20px; font-weight: 600; min-width: 60px; text-align: center;">F16</div>
+            </div>
+            
+            <div class="migration-row" style="display: flex; align-items: center; justify-content: space-between; margin: 8px 0;">
+              <div class="sku-badge" style="background: rgba(245, 158, 11, 0.15); border: 2px solid #f59e0b; color: #f59e0b; padding: 8px 16px; border-radius: 20px; font-weight: 600; min-width: 60px; text-align: center;">EM3</div>
+              <div style="flex: 1; height: 2px; background: linear-gradient(to right, #f59e0b, #10b981); margin: 0 10px; position: relative;">
+                <div style="position: absolute; right: -6px; top: -4px; width: 0; height: 0; border-left: 8px solid #10b981; border-top: 5px solid transparent; border-bottom: 5px solid transparent;"></div>
+              </div>
+              <div class="sku-badge" style="background: rgba(16, 185, 129, 0.15); border: 2px solid #10b981; color: #10b981; padding: 8px 16px; border-radius: 20px; font-weight: 600; min-width: 60px; text-align: center;">F32</div>
+            </div>
+            
+            <!-- P to F mappings -->
+            <div class="migration-row" style="display: flex; align-items: center; justify-content: space-between; margin: 8px 0;">
+              <div class="sku-badge" style="background: rgba(245, 158, 11, 0.15); border: 2px solid #f59e0b; color: #f59e0b; padding: 8px 16px; border-radius: 20px; font-weight: 600; min-width: 60px; text-align: center;">P1</div>
+              <div style="flex: 1; height: 2px; background: linear-gradient(to right, #f59e0b, #10b981); margin: 0 10px; position: relative;">
+                <div style="position: absolute; right: -6px; top: -4px; width: 0; height: 0; border-left: 8px solid #10b981; border-top: 5px solid transparent; border-bottom: 5px solid transparent;"></div>
+              </div>
+              <div class="sku-badge" style="background: rgba(16, 185, 129, 0.15); border: 2px solid #10b981; color: #10b981; padding: 8px 16px; border-radius: 20px; font-weight: 600; min-width: 60px; text-align: center;">F64</div>
+            </div>
+            
+            <div class="migration-row" style="display: flex; align-items: center; justify-content: space-between; margin: 8px 0;">
+              <div class="sku-badge" style="background: rgba(245, 158, 11, 0.15); border: 2px solid #f59e0b; color: #f59e0b; padding: 8px 16px; border-radius: 20px; font-weight: 600; min-width: 60px; text-align: center;">P2</div>
+              <div style="flex: 1; height: 2px; background: linear-gradient(to right, #f59e0b, #10b981); margin: 0 10px; position: relative;">
+                <div style="position: absolute; right: -6px; top: -4px; width: 0; height: 0; border-left: 8px solid #10b981; border-top: 5px solid transparent; border-bottom: 5px solid transparent;"></div>
+              </div>
+              <div class="sku-badge" style="background: rgba(16, 185, 129, 0.15); border: 2px solid #10b981; color: #10b981; padding: 8px 16px; border-radius: 20px; font-weight: 600; min-width: 60px; text-align: center;">F128</div>
+            </div>
+            
+            <div class="migration-row" style="display: flex; align-items: center; justify-content: space-between; margin: 8px 0;">
+              <div class="sku-badge" style="background: rgba(245, 158, 11, 0.15); border: 2px solid #f59e0b; color: #f59e0b; padding: 8px 16px; border-radius: 20px; font-weight: 600; min-width: 60px; text-align: center;">P3</div>
+              <div style="flex: 1; height: 2px; background: linear-gradient(to right, #f59e0b, #10b981); margin: 0 10px; position: relative;">
+                <div style="position: absolute; right: -6px; top: -4px; width: 0; height: 0; border-left: 8px solid #10b981; border-top: 5px solid transparent; border-bottom: 5px solid transparent;"></div>
+              </div>
+              <div class="sku-badge" style="background: rgba(16, 185, 129, 0.15); border: 2px solid #10b981; color: #10b981; padding: 8px 16px; border-radius: 20px; font-weight: 600; min-width: 60px; text-align: center;">F256</div>
+            </div>
+            
+            <div class="migration-row" style="display: flex; align-items: center; justify-content: space-between; margin: 8px 0;">
+              <div class="sku-badge" style="background: rgba(245, 158, 11, 0.15); border: 2px solid #f59e0b; color: #f59e0b; padding: 8px 16px; border-radius: 20px; font-weight: 600; min-width: 60px; text-align: center;">P4</div>
+              <div style="flex: 1; height: 2px; background: linear-gradient(to right, #f59e0b, #10b981); margin: 0 10px; position: relative;">
+                <div style="position: absolute; right: -6px; top: -4px; width: 0; height: 0; border-left: 8px solid #10b981; border-top: 5px solid transparent; border-bottom: 5px solid transparent;"></div>
+              </div>
+              <div class="sku-badge" style="background: rgba(16, 185, 129, 0.15); border: 2px solid #10b981; color: #10b981; padding: 8px 16px; border-radius: 20px; font-weight: 600; min-width: 60px; text-align: center;">F512</div>
+            </div>
+            
+            <div class="migration-row" style="display: flex; align-items: center; justify-content: space-between; margin: 8px 0;">
+              <div class="sku-badge" style="background: rgba(245, 158, 11, 0.15); border: 2px solid #f59e0b; color: #f59e0b; padding: 8px 16px; border-radius: 20px; font-weight: 600; min-width: 60px; text-align: center;">P5</div>
+              <div style="flex: 1; height: 2px; background: linear-gradient(to right, #f59e0b, #10b981); margin: 0 10px; position: relative;">
+                <div style="position: absolute; right: -6px; top: -4px; width: 0; height: 0; border-left: 8px solid #10b981; border-top: 5px solid transparent; border-bottom: 5px solid transparent;"></div>
+              </div>
+              <div class="sku-badge" style="background: rgba(16, 185, 129, 0.15); border: 2px solid #10b981; color: #10b981; padding: 8px 16px; border-radius: 20px; font-weight: 600; min-width: 60px; text-align: center;">F1024</div>
+            </div>
+            
+          </div>
+        </div>
+        
+        <div class="muted" style="margin-top: 30px; padding: 16px; background: rgba(59, 130, 246, 0.1); border-radius: 8px; border-left: 4px solid #3b82f6;">
+          <strong>Migration Considerations:</strong><br>
+          • <strong>F64 and above</strong> enable free viewer access, eliminating the need for Pro licenses for consumers<br>
+          • <strong>F8, F16, F32</strong> require Pro or PPU licenses for all users (similar to EM SKUs)<br>
+          • Fabric SKUs include additional capabilities beyond Power BI (Data Factory, Synapse, Real-Time Analytics, etc.)<br>
+          • Consider <a href="https://learn.microsoft.com/en-us/azure/cost-management-billing/reservations/fabric-capacity" target="_blank" style="color: #10b981; text-decoration: underline;">Azure reservations</a> for ~41% cost savings on annual commitments<br>
+          • Review the <a href="https://learn.microsoft.com/en-us/fabric/enterprise/licenses" target="_blank" style="color: #10b981; text-decoration: underline;">Microsoft Fabric licensing documentation</a> for complete details
         </div>
       </section>
     </main>
@@ -448,5 +560,7 @@
     </main>
   </div>
 </div>
+
+<script src="script.js"></script>
 </body>
 </html>

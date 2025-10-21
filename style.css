@@ -281,3 +281,194 @@
     padding: 16px 8px;
   }
 }
+
+/* Print Styles */
+@media print {
+  /* Hide elements that shouldn't be printed */
+  .tabs-nav,
+  footer,
+  .btn,
+  .btn-primary,
+  #addCapacityBtn,
+  #resetBtn,
+  #sampleBtn,
+  #printBtn,
+  .del,
+  #limitNote {
+    display: none !important;
+  }
+  
+  /* Reset background and colors for print */
+  body {
+    background: white;
+    color: black;
+  }
+  
+  header {
+    background: white;
+    border-bottom: 2px solid #333;
+    position: relative;
+    backdrop-filter: none;
+  }
+  
+  h1 {
+    color: #000;
+  }
+  
+  .sub {
+    color: #555;
+  }
+  
+  .sub a {
+    color: #0066cc;
+  }
+  
+  /* Show only the active tab when printing */
+  .tab-panel {
+    display: none !important;
+  }
+  
+  .tab-panel.active {
+    display: block !important;
+  }
+  
+  /* Card styles for print */
+  .card {
+    background: white;
+    border: 1px solid #ddd;
+    box-shadow: none;
+    page-break-inside: avoid;
+  }
+  
+  .card h2 {
+    color: #000;
+  }
+  
+  /* Table styles for print */
+  .table {
+    border: 1px solid #333;
+  }
+  
+  .table th {
+    background: #f0f0f0 !important;
+    color: #000 !important;
+    border: 1px solid #333;
+  }
+  
+  .table td {
+    color: #000;
+    border: 1px solid #ddd;
+  }
+  
+  /* Input and select styles for print */
+  input, select {
+    border: 1px solid #333;
+    background: white;
+    color: #000;
+  }
+  
+  label {
+    color: #333;
+  }
+  
+  .muted {
+    color: #555;
+  }
+  
+  /* Recommendation box */
+  .rec {
+    border: 2px solid #333;
+    background: #f9f9f9;
+  }
+  
+  .rec .title {
+    color: #000;
+  }
+  
+  .rec .big {
+    color: #000;
+  }
+  
+  .rec .mini {
+    color: #555;
+  }
+  
+  /* KPI boxes */
+  .kpi .box {
+    background: white !important;
+    border: 1px solid #333 !important;
+  }
+  
+  .kpi h3 {
+    color: #000 !important;
+  }
+  
+  .kpi .value {
+    color: #000 !important;
+  }
+  
+  .kpi .mini {
+    color: #555 !important;
+  }
+  
+  /* Best row highlighting */
+  .best-row {
+    background: #e8f5e9 !important;
+  }
+  
+  .best-badge {
+    background: #4caf50 !important;
+    color: white !important;
+  }
+  
+  /* Notes section */
+  .note-wrap {
+    page-break-inside: avoid;
+  }
+  
+  .note-toggle {
+    display: none;
+  }
+  
+  .note-panel {
+    display: block !important;
+    max-height: none !important;
+    border: 1px solid #ddd;
+  }
+  
+  .note-input {
+    background: white;
+    color: #000;
+    border: 1px solid #ddd;
+  }
+  
+  .note-clear {
+    display: none;
+  }
+  
+  /* Date div */
+  #dateDiv {
+    color: #555;
+  }
+  
+  /* Page breaks */
+  .card {
+    page-break-after: auto;
+  }
+  
+  /* Ensure proper page layout */
+  @page {
+    margin: 1cm;
+  }
+  
+  /* Remove button actions from table cells */
+  .table button {
+    display: none;
+  }
+  
+  /* Print specific link styling */
+  a {
+    color: #0066cc;
+    text-decoration: underline;
+  }
+}
