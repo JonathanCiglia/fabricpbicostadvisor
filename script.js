@@ -43,7 +43,7 @@
     builders: 30,
     proCost: 14,
     capacities: [], // { id, name, region, monthlyCost }
-    maxInstances: 3
+    maxInstances: 4
   };
 
   // Currency map (common Azure pricing currencies)
