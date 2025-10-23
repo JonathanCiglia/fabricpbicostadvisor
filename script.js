@@ -37,12 +37,12 @@
 
   // --- State ---
   const state = {
-    currencyCode: "EUR",
-    currencySymbol: "€",
+    currencyCode: "USD",
+    currencySymbol: "$",
     viewers: 300,
     builders: 30,
     proCost: 14,
-    capacities: [], // { id, name, monthlyCost }
+    capacities: [], // { id, name, region, monthlyCost }
     maxInstances: 3
   };
 
@@ -53,6 +53,41 @@
     "NZD": "NZ$","BRL": "R$","MXN": "MX$","ZAR": "R","AED": "د.إ","SAR": "﷼",
     "TRY": "₺","PLN": "zł","CZK": "Kč","HUF": "Ft","ILS": "₪"
   };
+
+  const fabricRegions = [
+    "Australia East",
+    "Australia Southeast",
+    "Brazil South",
+    "Canada Central",
+    "Canada East",
+    "Central India",
+    "Central US",
+    "East Asia",
+    "East US",
+    "East US 2",
+    "France Central",
+    "Germany West Central",
+    "Japan East",
+    "Japan West",
+    "Korea Central",
+    "North Central US",
+    "North Europe",
+    "Norway East",
+    "South Africa North",
+    "South Central US",
+    "South India",
+    "Southeast Asia",
+    "Sweden Central",
+    "Switzerland North",
+    "UAE North",
+    "UK South",
+    "UK West",
+    "West Central US",
+    "West Europe",
+    "West US",
+    "West US 2",
+    "West US 3"
+  ];
 
   // --- Helpers ---
   const fmt = (v) => Number.isFinite(v) ? v.toLocaleString(undefined, {maximumFractionDigits: 2}) : "—";
@@ -92,6 +127,7 @@
         return {
           id: c.id,
           name: c.name || "(unnamed)",
+          region: c.region || "",
           monthlyCost: cap,
           viewerUnitCost: vUnit,
           buildersCost,
@@ -107,7 +143,7 @@
 
     const allRows = [
       ...caps.map(c => ({
-        label: c.name,
+        label: c.region ? `${c.name} — ${c.region}` : c.name,
         policy: c.viewerUnitCost === 0 ? "Free viewers" : "Viewers & builders require Pro ",
         capCost: c.monthlyCost,
         buildersCost: c.buildersCost,
@@ -154,7 +190,10 @@
   }
 
   function updateRecommendation(caps, ppuOnly) {
-    const candidates = [...caps.map(x => ({ label: `${x.name}`, total: x.total }))];
+    const candidates = [...caps.map(x => ({
+      label: x.region ? `${x.name} — ${x.region}` : `${x.name}`,
+      total: x.total
+    }))];
     const best = candidates.length > 0 ? candidates.reduce((a, b) => (b.total < a.total ? b : a)) : undefined;
     const worst = candidates.length > 0 ? candidates.reduce((a, b) => (b.total > a.total ? b : a)) : undefined;
     byId("recommendationMain").textContent = best ? `${best.label} — ${money(best.total * 12)} / year` : 'Add capacities to see a recommendation';
@@ -180,7 +219,7 @@
   // --- UI Wiring ---
   function readInputs() {
     state.currencyCode = byId("currencySelect").value;
-    state.currencySymbol = currencyMap[state.currencyCode] || "€";
+    state.currencySymbol = currencyMap[state.currencyCode] || "$";
     state.viewers = Number(byId("viewerCount").value) || 0;
     state.builders = Number(byId("builderCount").value) || 0;
     state.proCost = Number(byId("proCost").value) || 0;
@@ -197,7 +236,7 @@
     addBtn.disabled = state.capacities.length >= state.maxInstances;
   }
 
-  function addCapacityRow(name = "", monthlyCost = "") {
+  function addCapacityRow(name = "", monthlyCost = "", region) {
     if (state.capacities.length >= state.maxInstances) {
       updateAddButtonState();
       updateKPIs();
@@ -212,23 +251,43 @@
       sku => `<option value="${sku}"${sku === selectedSKU ? " selected" : ""}>${sku}</option>`
     ).join("");
 
+  const initialRegion = (typeof region === "string" ? region : "").trim();
+
 
     const id = capIdCounter++;
     const row = document.createElement("tr");
     row.dataset.id = id;
 
-    state.capacities.push({ id, name: selectedSKU, monthlyCost: Number(monthlyCost) || 0 });
+    state.capacities.push({ id, name: selectedSKU, region: initialRegion, monthlyCost: Number(monthlyCost) || 0 });
 
     row.innerHTML = `
-      <td><select>${options}</select></td>
-      <td><input type="integer" min="0" placeholder="0.0" value="${monthlyCost}" /></td>
+      <td>
+        <div class="instance-inputs">
+          <select>${options}</select>
+          <select data-role="region">
+            <option value="">Region (optional)</option>
+            ${fabricRegions.map(r => `<option value="${r}">${r}</option>`).join("")}
+          </select>
+        </div>
+      </td>
+      <td><input type="integer" min="0" placeholder="0.0" value="${monthlyCost}" data-role="cost" /></td>
       <td class="right"><button class="del">Remove</button></td>
     `;
 
-    const [skuSelect, costInput, delBtn] = row.querySelectorAll("select, input, button");
+    const skuSelect = row.querySelector("select");
+  const regionSelect = row.querySelector('select[data-role="region"]');
+    const costInput = row.querySelector('input[data-role="cost"]');
+    const delBtn = row.querySelector("button.del");
+
+  if (regionSelect) regionSelect.value = initialRegion;
     skuSelect.addEventListener("change", () => {
       const cap = state.capacities.find(c => c.id === id);
       if (cap) cap.name = skuSelect.value;
+      updateKPIs();
+    });
+    regionSelect?.addEventListener("change", () => {
+      const cap = state.capacities.find(c => c.id === id);
+      if (cap) cap.region = regionSelect.value;
       updateKPIs();
     });
     costInput.addEventListener("input", () => {
@@ -253,14 +312,13 @@
 
   // Footer actions
   byId("resetBtn").addEventListener("click", () => {
-    byId("currencySelect").value = "EUR";
+    byId("currencySelect").value = "USD";
     byId("viewerCount").value = 0;
     byId("builderCount").value = 0;
     byId("proCost").value = 0;
-    byId("fabricRegion").value = "";
     byId("recommendationMain").textContent = "";
-    state.currencyCode = "EUR";
-    state.currencySymbol = currencyMap["EUR"];
+    state.currencyCode = "USD";
+    state.currencySymbol = currencyMap["USD"] || "$";
 
     state.capacities = [];
     tbody.innerHTML = "";
@@ -276,15 +334,14 @@
     byId("viewerCount").value = 1200;
     byId("builderCount").value = 25;
     byId("proCost").value = 14;
-    byId("fabricRegion").value = "North Europe";
 
     // Clear existing capacities
     state.capacities = [];
     tbody.innerHTML = "";
     
     // Add sample capacities
-    addCapacityRow("F32", "2640");
-    addCapacityRow("F64", "5280");
+    addCapacityRow("F32", "2640", "North Europe");
+    addCapacityRow("F64", "5280", "North Europe");
     
     // Read form inputs to update state, then update KPIs
     readInputs();
@@ -302,8 +359,8 @@
   byId("builderCount").value = state.builders;
   byId("proCost").value = state.proCost;
   
-  addCapacityRow("F32", "2640");
-  addCapacityRow("F64", "5280");
+  addCapacityRow("F32", "2640", "North Europe");
+  addCapacityRow("F64", "5280", "North Europe");
   updateKPIs();
 
 

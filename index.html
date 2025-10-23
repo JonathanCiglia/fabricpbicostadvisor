@@ -38,7 +38,7 @@
         <label>Currency</label>
         <select id="currencySelect">
           <option value="EUR">EUR (€)</option>
-          <option value="USD">USD ($)</option>
+          <option value="USD" selected>USD ($)</option>
           <option value="GBP">GBP (£)</option>
           <option value="AUD">AUD (A$)</option>
           <option value="CAD">CAD (C$)</option>
@@ -63,8 +63,8 @@
         </select>
       </div>
       <div>
-        <label>Fabric <strong>Region </strong></label>
-        <input id="fabricRegion" type="text" value="North Europe" placeholder="ie: North Europe"/>
+        <label>PBI <strong>Pro</strong> <a href="https://www.microsoft.com/en-us/power-platform/products/power-bi#Pricing" target="_blank">cost per user / month</a></label>
+        <input id="proCost" type="integer" min="0" value="14" placeholder="14" />
       </div>
     </div>
 
@@ -79,13 +79,6 @@
       </div>
     </div>
 
-    <div class="row">
-      <div>
-        <label>PBI <strong>Pro</strong> <a href="https://www.microsoft.com/en-us/power-platform/products/power-bi#Pricing" target="_blank">cost per user / month</a></label>
-        <input id="proCost" type="integer" min="0" value="14" placeholder="14" />
-      </div>
-    </div>
-
     <hr style="border: none; border-top: 1px solid var(--border); margin: 14px 0;" />
 
     <h2>Fabric instances</h2>
@@ -96,8 +89,8 @@
     <table class="table" id="capacityTable">
       <thead>
         <tr>
-          <th style="width:60%">Instance name</th>
-          <th style="width:35%">Monthly cost</th>
+          <th style="width:68%">Instance name &amp; region</th>
+          <th style="width:27%">Monthly cost</th>
           <th style="width:5%"></th>
         </tr>
       </thead>

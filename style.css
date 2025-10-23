@@ -27,9 +27,9 @@
   }
   h1 { margin: 0 0 6px; font-size: 20px; }
   .sub { color: var(--muted); font-size: 13px; }
-  main { padding: 20px 16px 90px; max-width: 1200px; margin: 0 auto; }
+  main { padding: 20px 16px 90px; max-width: 1400px; margin: 0 auto; }
   .grid { display: grid; gap: 16px; }
-  @media (min-width: 980px) { .grid { grid-template-columns: 380px 1fr; } }
+  @media (min-width: 980px) { .grid { grid-template-columns: 480px 1fr; } }
   .card {
     background: linear-gradient(180deg, var(--panel) 0%, #0a0f1c 100%);
     border: 1px solid var(--border);
@@ -58,6 +58,10 @@
   .table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 14px; }
   .table th, .table td { border-bottom: 1px solid var(--border); padding: 8px 6px; text-align: left; }
   .right { text-align: right; }
+  .instance-inputs { display: flex; gap: 6px; align-items: center; }
+  .instance-inputs select { min-width: 0; }
+  .instance-inputs select:first-child { flex: 0 0 96px; }
+  .instance-inputs select:last-child { flex: 1 1 auto; }
   .del {
     color: #ef4444; background: #2a0c0c; border: 1px solid #7f1d1d; padding: 6px 10px; border-radius: 8px; cursor: pointer;
   }
@@ -470,5 +474,17 @@
   a {
     color: #0066cc;
     text-decoration: underline;
+  }
+}
+
+@media (max-width: 640px) {
+  .instance-inputs {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+  }
+
+  .instance-inputs select {
+    width: 100%;
   }
 }
