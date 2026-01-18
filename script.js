@@ -398,8 +398,10 @@
   // === LICENSE IMPACT TABLE ===
   function generateLicenseImpactTable() {
      const tableContainer = document.getElementById('licenseImpactTable');
-     const proCost = parseFloat(document.getElementById('licenseTableProCost').value) || 14;
-     const ppuCost = parseFloat(document.getElementById('licenseTablePpuCost').value) || 24;
+     const proCostValue = parseFloat(document.getElementById('licenseTableProCost').value);
+     const proCost = Number.isNaN(proCostValue) ? 14 : proCostValue;
+     const ppuCostValue = parseFloat(document.getElementById('licenseTablePpuCost').value);
+     const ppuCost = Number.isNaN(ppuCostValue) ? 24 : ppuCostValue;
      const reservationDiscount = document.getElementById('reservationDiscount').checked;
      const hideProOnly = document.getElementById('hideProOnly').checked;
      const hidePpuOnly = document.getElementById('hidePpuOnly').checked;
