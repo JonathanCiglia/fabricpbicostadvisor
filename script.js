@@ -97,17 +97,97 @@
     const regionData = fabricPricingData.regions.find(r => r.arm_region_name === armRegionName);
     if (!regionData) return null;
 
-    const skuData = regionData.capacity_skus?.find(s => s.sku === skuName);
-    if (!skuData) return null;
+    // Extract SKU number from name (F2 → 2, F4 → 4, F8 → 8, F2048 → 2048, etc.)
+    const skuMatch = skuName.match(/^F(\d+)$/);
+    if (!skuMatch) return null;
+    const skuNumber = parseInt(skuMatch[1], 10);
+
+    // Get F2 base prices for this region
+    const f2Data = regionData.capacity_skus?.find(s => s.sku === 'F2');
+    if (!f2Data) return null;
+    const f2PaygPrice = f2Data.payg_monthly_usd;
+    
+    // Get ACTUAL F2 reservation price from the pricing mapping (from Azure Pricing Page)
+    let f2ReservationPrice = f2ReservationPricesByRegion[armRegionName];
+    
+    // If region not in mapping or N/A, calculate from PAYG as fallback
+    if (f2ReservationPrice === null || f2ReservationPrice === undefined) {
+      const RESERVATION_1YR_MULTIPLIER = 0.5949;
+      f2ReservationPrice = f2PaygPrice * RESERVATION_1YR_MULTIPLIER;
+    }
+
+    // Calculate prices by scaling from F2 base
+    // F4 = F2×2, F8 = F2×4, F16 = F2×8, etc.
+    const scalingFactor = skuNumber / 2;
+    const paygPrice = f2PaygPrice * scalingFactor;
+    const reservationPrice = f2ReservationPrice * scalingFactor;
 
     return {
-      skuName: skuData.sku,
+      skuName: skuName,
       region: regionData.location_display,
-      payg_monthly_usd: skuData.payg_monthly_usd,
-      reservation_1yr_monthly_usd: skuData.reservation_1yr_monthly_usd,
-      reservation_3yr_monthly_usd: skuData.reservation_3yr_monthly_usd
+      payg_monthly_usd: paygPrice,
+      reservation_1yr_monthly_usd: reservationPrice,
+      reservation_3yr_monthly_usd: null
     };
   }
+
+  // --- F2 Reservation Prices by Region (from Azure Pricing Page) ---
+  // Captured from: https://azure.microsoft.com/en-us/pricing/details/microsoft-fabric/
+  const f2ReservationPricesByRegion = {
+    "centralus": 156.334,
+    "eastus": 156.334,
+    "eastus2": 156.334,
+    "northcentralus": 156.334,
+    "southcentralus": 156.334,
+    "westcentralus": 173.667,
+    "westus": 173.667,
+    "westus2": 156.334,
+    "westus3": 156.334,
+    "uksouth": 182.334,
+    "ukwest": 182.334,
+    "uaecentral": null, // N/A
+    "uaenorth": 191,
+    "switzerlandnorth": 199.667,
+    "switzerlandwest": 251.667,
+    "swedencentral": 165,
+    "spaincentral": 165,
+    "qatarcentral": 223.667,
+    "polandcentral": 191,
+    "norwayeast": 208.334,
+    "norwaywest": null, // N/A
+    "newzealandnorth": 191,
+    "mexicocentral": 165,
+    "malaysiawest": 165,
+    "koreacentral": 182.334,
+    "koreasouth": null, // N/A
+    "japaneast": 182.334,
+    "japanwest": 182.334,
+    "italynorth": 182.334,
+    "israelcentral": 173.667,
+    "indonesiacentral": 165,
+    "centralindia": 173.667,
+    "southindia": 191,
+    "westindia": null, // N/A
+    "germanynorth": null, // N/A
+    "germanywestcentral": 191,
+    "francecentral": 173.667,
+    "francesouth": null, // N/A
+    "northeurope": 165,
+    "westeurope": 191,
+    "denmarkeast": 203.334,
+    "chilecentral": 217.167,
+    "canadacentral": 173.667,
+    "canadaeast": 173.667,
+    "brazilsouth": 243,
+    "belgiumcentral": 203.334,
+    "austriaeast": 203.334,
+    "australiaeast": 182.334,
+    "australiasoutheast": 182.334,
+    "eastasia": 156.334,
+    "southeastasia": 191,
+    "southafricanorth": 208.334,
+    "southafricawest": null, // N/A
+  };
 
   // --- State ---
   const state = {
@@ -238,13 +318,11 @@
   function computeCapacityTotals() {
     return state.capacities
       .slice(0, state.maxInstances)
+      .filter(c => Boolean(c.region))
       .map(c => {
         const vUnit = viewerUnitCost(c.name);
+        // Use reservation price if enabled, otherwise PAYG price
         let cap = c.monthlyCost || 0;
-        // Apply 41% reservation discount (59% of original cost) if enabled
-        if (c.hasReservation) {
-          cap = cap * 0.59;
-        }
         const buildersCost = state.builders * state.proCost;
         const viewersCost = state.viewers * vUnit;
         const total = cap + buildersCost + viewersCost;
@@ -384,12 +462,14 @@
     const row = document.createElement("tr");
     row.dataset.id = id;
 
-    // Calculate initial cost
+    // Calculate initial cost and reservation price
     let initialCost = monthlyCost;
+    let reservationPrice = 0;
     if (!initialCost && initialRegion && selectedSKU && fabricPricingData) {
       const pricing = getPricingForCapacityAndRegion(selectedSKU, initialRegion);
       if (pricing) {
         initialCost = pricing.payg_monthly_usd;
+        reservationPrice = pricing.reservation_1yr_monthly_usd;
       }
     }
 
@@ -398,6 +478,8 @@
       name: selectedSKU, 
       region: initialRegion, 
       monthlyCost: Number(initialCost) || 0,
+      paygMonthly: Number(initialCost) || 0,
+      reservationMonthly: reservationPrice || 0,
       hasReservation: false
     });
 
@@ -424,12 +506,42 @@
     const updateCostFromPricing = () => {
       const currentSKU = skuSelect.value;
       const currentRegion = regionSelect.value;
+      const cap = state.capacities.find(c => c.id === id);
+
+      if (!currentRegion) {
+        costInput.value = "0";
+        if (cap) {
+          cap.monthlyCost = 0;
+          cap.paygMonthly = 0;
+          cap.reservationMonthly = 0;
+        }
+        updateKPIs();
+        return;
+      }
+
+      // Check if region supports reservation (null = N/A on Azure pricing page)
+      const reservationSupported = f2ReservationPricesByRegion[currentRegion] !== null &&
+                                   f2ReservationPricesByRegion[currentRegion] !== undefined;
+      reservationCheckbox.disabled = !reservationSupported;
+      reservationCheckbox.title = reservationSupported ? '' : 'Fabric reservations are not available in this region';
+      reservationCheckbox.style.cursor = reservationSupported ? 'pointer' : 'not-allowed';
+      reservationCheckbox.style.opacity = reservationSupported ? '1' : '0.35';
+      if (!reservationSupported && reservationCheckbox.checked) {
+        reservationCheckbox.checked = false;
+        if (cap) { cap.hasReservation = false; }
+      }
+
       if (currentSKU && currentRegion && fabricPricingData) {
         const pricing = getPricingForCapacityAndRegion(currentSKU, currentRegion);
         if (pricing) {
-          costInput.value = Math.round(pricing.payg_monthly_usd).toLocaleString();
-          const cap = state.capacities.find(c => c.id === id);
-          if (cap) cap.monthlyCost = pricing.payg_monthly_usd;
+          // Store both PAYG and reservation prices
+          if (cap) {
+            cap.paygMonthly = pricing.payg_monthly_usd;
+            cap.reservationMonthly = pricing.reservation_1yr_monthly_usd;
+            // Display the appropriate cost based on reservation checkbox
+            cap.monthlyCost = reservationCheckbox.checked ? pricing.reservation_1yr_monthly_usd : pricing.payg_monthly_usd;
+          }
+          costInput.value = Math.round(cap.monthlyCost).toLocaleString();
           updateKPIs();
           return;
         }
@@ -450,7 +562,17 @@
 
     reservationCheckbox.addEventListener("change", () => {
       const cap = state.capacities.find(c => c.id === id);
-      if (cap) cap.hasReservation = reservationCheckbox.checked;
+      // Update monthlyCost to use reservation or PAYG price based on checkbox
+      if (cap) {
+        if (reservationCheckbox.checked) {
+          cap.monthlyCost = (cap.reservationMonthly && cap.reservationMonthly > 0) ? cap.reservationMonthly : cap.paygMonthly;
+          cap.hasReservation = true;
+        } else {
+          cap.monthlyCost = cap.paygMonthly;
+          cap.hasReservation = false;
+        }
+        costInput.value = Math.round(cap.monthlyCost).toLocaleString();
+      }
       updateKPIs();
     });
 
@@ -477,6 +599,14 @@
     byId("viewerCount").value = 0;
     byId("builderCount").value = 0;
     byId("proCost").value = 0;
+    if (viewerSlider) {
+      viewerSlider.value = 0;
+      updateRangeFill(viewerSlider);
+    }
+    if (builderSlider) {
+      builderSlider.value = 0;
+      updateRangeFill(builderSlider);
+    }
     byId("recommendationMain").textContent = "";
 
     state.capacities = [];
@@ -495,6 +625,14 @@
     byId("viewerCount").value = 1200;
     byId("builderCount").value = 25;
     byId("proCost").value = 14;
+    if (viewerSlider) {
+      viewerSlider.value = 1200;
+      updateRangeFill(viewerSlider);
+    }
+    if (builderSlider) {
+      builderSlider.value = 25;
+      updateRangeFill(builderSlider);
+    }
 
     // Clear existing capacities
     state.capacities = [];
@@ -513,12 +651,71 @@
 
   byId("printBtn").addEventListener("click", () => window.print());
 
+  // --- Cost Estimator Sliders Sync ---
+  function updateRangeFill(slider) {
+    const min = Number(slider.min) || 0;
+    const max = Number(slider.max) || 100;
+    const progress = ((Number(slider.value) - min) / (max - min)) * 100;
+    slider.style.setProperty("--range-progress", `${progress}%`);
+  }
+
+  const viewerSlider = byId("viewerSliderEstimator") || null;
+  const builderSlider = byId("builderSliderEstimator") || null;
+
+  // Sync slider to inputs and trigger calculation
+  if (viewerSlider) {
+    viewerSlider.addEventListener("input", () => {
+      byId("viewerCount").value = viewerSlider.value;
+      updateRangeFill(viewerSlider);
+      readInputs();
+    });
+  }
+
+  if (builderSlider) {
+    builderSlider.addEventListener("input", () => {
+      byId("builderCount").value = builderSlider.value;
+      updateRangeFill(builderSlider);
+      readInputs();
+    });
+  }
+
+  // Sync number inputs to sliders and trigger calculation
+  byId("viewerCount").addEventListener("input", () => {
+    const val = Math.min(Math.max(Number(byId("viewerCount").value) || 0, 0), 2000);
+    byId("viewerCount").value = val;
+    if (viewerSlider) {
+      viewerSlider.value = val;
+      updateRangeFill(viewerSlider);
+    }
+    readInputs();
+  });
+
+  byId("builderCount").addEventListener("input", () => {
+    const val = Math.min(Math.max(Number(byId("builderCount").value) || 0, 0), 200);
+    byId("builderCount").value = val;
+    if (builderSlider) {
+      builderSlider.value = val;
+      updateRangeFill(builderSlider);
+    }
+    readInputs();
+  });
+
   // --- Init defaults ---
   // Set form values to match initial state
   // Currency locked to USD
   byId("viewerCount").value = state.viewers;
   byId("builderCount").value = state.builders;
   byId("proCost").value = state.proCost;
+  
+  // Initialize sliders
+  if (viewerSlider) {
+    viewerSlider.value = state.viewers;
+    updateRangeFill(viewerSlider);
+  }
+  if (builderSlider) {
+    builderSlider.value = state.builders;
+    updateRangeFill(builderSlider);
+  }
   
   // Add initial capacities with pricing lookup using arm_region_name
   addCapacityRow("F32", "", "centralus");
@@ -565,14 +762,27 @@
      const proCost = Number.isNaN(proCostValue) ? 14 : proCostValue;
      const ppuCostValue = parseFloat(document.getElementById('licenseTablePpuCost').value);
      const ppuCost = Number.isNaN(ppuCostValue) ? 24 : ppuCostValue;
-     const reservationDiscount = document.getElementById('reservationDiscount').checked;
+
+     // Disable reservation checkbox if selected region doesn't support reservations
+     const licenseRegion = document.getElementById('licenseTableRegion').value;
+     const licenseResCheckbox = document.getElementById('reservationDiscount');
+     const licenseResSupported = !licenseRegion ||
+       (f2ReservationPricesByRegion[licenseRegion] !== null && f2ReservationPricesByRegion[licenseRegion] !== undefined);
+     licenseResCheckbox.disabled = !licenseResSupported;
+     licenseResCheckbox.style.cursor = licenseResSupported ? 'pointer' : 'not-allowed';
+     licenseResCheckbox.style.opacity = licenseResSupported ? '1' : '0.35';
+     licenseResCheckbox.title = licenseResSupported ? '' : 'Fabric reservations are not available in this region';
+     if (!licenseResSupported && licenseResCheckbox.checked) {
+       licenseResCheckbox.checked = false;
+     }
+
+     const reservationDiscount = licenseResSupported && licenseResCheckbox.checked;
      const hideProOnly = document.getElementById('hideProOnly').checked;
      const hidePpuOnly = document.getElementById('hidePpuOnly').checked;
      const symbol = '$'; // Fixed to USD
      const selectedRegionArm = document.getElementById('licenseTableRegion').value;
 
-    // Get pricing for selected region from fabricPricingData
-    const regionData = fabricPricingData.regions.find(r => r.arm_region_name === selectedRegionArm);
+    // Get pricing for selected region using the same function as the Regional Cost Estimator
     const fabricSKUs = [
       { name: 'F8', viewerPolicy: 'Pro required', computeUnits: 8 },
       { name: 'F16', viewerPolicy: 'Pro required', computeUnits: 16 },
@@ -581,12 +791,12 @@
       { name: 'F128', viewerPolicy: 'Free viewers', computeUnits: 128 },
       { name: 'F256', viewerPolicy: 'Free viewers', computeUnits: 256 }
     ].map(sku => {
-      if (!regionData) {
+      if (!selectedRegionArm) {
         return { ...sku, monthlyCost: 0, originalCost: 0 };
       }
-      const skuData = regionData.capacity_skus?.find(s => s.sku === sku.name);
-      const paygCost = skuData?.payg_monthly_usd || 0;
-      const reservationCost = paygCost * 0.59; // 41% discount = 59% of PAYG
+      const pricing = getPricingForCapacityAndRegion(sku.name, selectedRegionArm);
+      const paygCost = pricing?.payg_monthly_usd || 0;
+      const reservationCost = pricing?.reservation_1yr_monthly_usd || 0;
       return {
         ...sku,
         monthlyCost: reservationDiscount ? reservationCost : paygCost,
@@ -742,10 +952,15 @@
     const snappedValue = snapViewersValue(this.value);
     this.value = snappedValue;
     viewersCount.textContent = snappedValue;
+    updateRangeFill(this);
     generateLicenseImpactTable();
   });
   
   buildersSlider.addEventListener('input', function() {
     buildersCount.textContent = this.value;
+    updateRangeFill(this);
     generateLicenseImpactTable();
   });
+
+  updateRangeFill(viewersSlider);
+  updateRangeFill(buildersSlider);

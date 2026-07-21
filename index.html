@@ -12,13 +12,20 @@
   <div class="sub">
     📚 <a href="https://azure.microsoft.com/en-us/pricing/details/microsoft-fabric/" target="_blank">Official Fabric pricing page</a>
     <br/> This tool helps to estimate whenever F64 or larger SKUs can reduce Power BI Pro licensing costs by enabling free viewer licenses.
-    <br>Choosing a Fabric capacity goes beyond licensing costs: visit the <a href="https://www.microsoft.com/en-us/microsoft-fabric/capacity-estimator" target="_blank">Fabric Capacity Estimator</a> & the <a href="https://learn.microsoft.com/en-us/fabric/enterprise/powerbi/service-premium-what-is#semantic-model-sku-limitation" target="_blank">semantic model documentation in Fabric</a> for guidance.
+    <div class="capacity-guidance">
+      Choosing a Fabric capacity goes beyond licensing costs. See:
+      <ul>
+        <li><a href="https://www.microsoft.com/en-us/microsoft-fabric/capacity-estimator" target="_blank">Fabric Capacity Estimator</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/fabric/enterprise/powerbi/service-premium-what-is#semantic-model-sku-limitation" target="_blank">Semantic model documentation in Fabric</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/fabric/admin/region-availability#regional-fabric-and-power-bi-workload-availability" target="_blank">Workload availability</a></li>
+      </ul>
+    </div>
   </div>
 </header>
 
 <!-- Tabs Navigation -->
 <nav class="tabs-nav">
-  <button class="tab-button active" data-tab="estimator">Cost estimator</button>
+  <button class="tab-button active" data-tab="estimator">Regional cost estimator</button>
   <button class="tab-button" data-tab="licensing">License impact table</button>
   <button class="tab-button" data-tab="migration">P to F Migration</button>
   <button class="tab-button" data-tab="features">Features comparison</button>
@@ -28,7 +35,7 @@
 <div class="tab-content">
   <!-- Estimator Tab -->
   <div id="estimator-tab" class="tab-panel active">
-<main class="grid">
+<main class="grid estimator-main">
   <!-- Left: Inputs -->
   <section class="card">
     <h2>Inputs</h2>
@@ -44,14 +51,19 @@
       </div>
     </div>
 
-    <div class="row">
-      <div>
-        <label>Number of <strong>Viewers</strong></label>
-        <input id="viewerCount" type="integer" min="0" value="300" placeholder="1200" />
+    <div class="slider-field">
+      <label for="viewerSliderEstimator" class="slider-label">Number of <strong>Viewers</strong></label>
+      <div class="slider-control">
+        <input class="range-slider" type="range" id="viewerSliderEstimator" min="0" max="2000" step="1" value="300">
+        <input class="slider-value" id="viewerCount" type="number" min="0" max="2000" value="300" aria-label="Number of viewers" />
       </div>
-      <div>
-        <label>Number of <strong>Builders</strong></label>
-        <input id="builderCount" type="integer" min="0" value="30" placeholder="30" />
+    </div>
+
+    <div class="slider-field slider-field--green">
+      <label for="builderSliderEstimator" class="slider-label">Number of <strong>Builders</strong></label>
+      <div class="slider-control">
+        <input class="range-slider" type="range" id="builderSliderEstimator" min="0" max="200" step="5" value="30">
+        <input class="slider-value" id="builderCount" type="number" min="0" max="200" value="30" aria-label="Number of builders" />
       </div>
     </div>
 
@@ -98,7 +110,7 @@
     </div>
     &nbsp;
     <div class="card" style="margin-top:12px;">
-      <h3 style="margin:0 0 9px;">Comparison table</h3>
+      <h3 style="margin:0 0 9px;">Cost comparison table</h3>
       <div id="comparisonTableWrap">Add capacity options (max 3) to see the table.</div>
     </div>
     <div class="muted" style="margin-top:8px;">
@@ -138,7 +150,7 @@
         <h2>Fabric SKU vs Power BI Licensing</h2>
         <p class="muted">This table shows the licensing cost impact when moving from Power BI Pro/PPU to different Fabric SKU sizes, based on estimated team size.</p>
         <p class="muted">Note: This document is provided for informational purposes only and does not constitute a formal quotation
-        <br>Capacity costs are dynamically updated based on your selected region's Fabric pricing.
+        <br>
       </p>
   <hr style="border: none; border-top: 1px solid var(--border); margin: 16px 0;" />
         
@@ -247,19 +259,17 @@
           <div style="width: 100%;">
             <h3 style="margin: 0 0 20px; color: #f3f4f6;">Custom Scenario Builder</h3>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
-              <div>
-                <label for="viewersSlider" style="display: block; margin-bottom: 8px; font-weight: 600;">
+              <div class="slider-field">
+                <label for="viewersSlider" class="slider-label">
                   Viewers: <span id="viewersCount" style="color: #3b82f6;">300</span>
                 </label>
-                <input type="range" id="viewersSlider" min="0" max="2000" step="1" value="300" 
-                       style="width: 100%; height: 6px; border-radius: 3px; background: #374151; outline: none; cursor: pointer;">
+                <input class="range-slider" type="range" id="viewersSlider" min="0" max="2000" step="1" value="300">
               </div>
-              <div>
-                <label for="buildersSlider" style="display: block; margin-bottom: 8px; font-weight: 600;">
+              <div class="slider-field slider-field--green">
+                <label for="buildersSlider" class="slider-label">
                   Builders: <span id="buildersCount" style="color: #10b981;">30</span>
                 </label>
-                <input type="range" id="buildersSlider" min="0" max="200" step="5" value="30" 
-                       style="width: 100%; height: 6px; border-radius: 3px; background: #374151; outline: none; cursor: pointer;">
+                <input class="range-slider" type="range" id="buildersSlider" min="0" max="200" step="5" value="30">
               </div>
             </div>
           </div>
@@ -370,10 +380,10 @@
         <div class="muted" style="margin-top: 30px; padding: 16px; background: rgba(59, 130, 246, 0.1); border-radius: 8px; border-left: 4px solid #3b82f6;">
           <strong>Migration Considerations:</strong><br>
           • <strong>F64 and above</strong> enable free viewer access, eliminating the need for Pro licenses for consumers<br>
-          • <strong>F8, F16, F32</strong> require Pro or PPU licenses for all users (similar to EM SKUs)<br>
+          • <strong>F8, F16, F32</strong> require Pro or PPU licenses for all users (similar to EM SKUs) in Power BI<br>
           • Fabric SKUs include additional capabilities beyond Power BI (Data Factory, Synapse, Real-Time Analytics, etc.)<br>
           • Consider <a href="https://learn.microsoft.com/en-us/azure/cost-management-billing/reservations/fabric-capacity" target="_blank" style="color: #10b981; text-decoration: underline;">Azure reservations</a> for ~41% cost savings on annual commitments<br>
-          • Review the <a href="https://learn.microsoft.com/en-us/fabric/enterprise/licenses" target="_blank" style="color: #10b981; text-decoration: underline;">Microsoft Fabric licensing documentation</a> for complete details
+          • Review the <a href="https://learn.microsoft.com/en-us/fabric/enterprise/licenses" target="_blank" style="color: #10b981; text-decoration: underline;">Microsoft Fabric licensing documentation</a> for more details
         </div>
       </section>
     </main>
@@ -410,7 +420,13 @@
                 <td style="text-align: center; color: #22c55e;">✅</td>
               </tr>
               <tr>
-                <td>Copilot</td>
+                <td><a href="https://learn.microsoft.com/fabric/fundamentals/copilot-fabric-overview" target="_blank">Copilot</a></td>
+                <td style="text-align: center; color: #ef4444;">❌</td>
+                <td style="text-align: center; color: #ef4444;">❌</td>
+                <td style="text-align: center; color: #22c55e;">✅</td>
+              </tr>
+              <tr>
+                <td><a href="https://learn.microsoft.com/fabric/data-science/concept-data-agent" target="_blank">Fabric Data Agents</a></td>
                 <td style="text-align: center; color: #ef4444;">❌</td>
                 <td style="text-align: center; color: #ef4444;">❌</td>
                 <td style="text-align: center; color: #22c55e;">✅</td>
@@ -421,7 +437,7 @@
                 <td colspan="4" style="font-weight: 600; color: #dbeafe; padding: 8px;">🗄️ Data & Models</td>
               </tr>
               <tr>
-                <td>Dataset size limit</td>
+                <td><a href="https://learn.microsoft.com/en-us/fabric/enterprise/powerbi/service-premium-what-is#semantic-model-sku-limitation" target="_blank">Dataset size limit</a></td>
                 <td style="text-align: center;">1 GB</td>
                 <td style="text-align: center; color: #10b981;">100 GB</td>
                 <td style="text-align: center; color: #10b981;">up to 400 GB</td>
@@ -433,7 +449,7 @@
                 <td style="text-align: center; color: #10b981;">48x daily</td>
               </tr>
               <tr>
-                <td>OneLake storage</td>
+                <td><a href="https://learn.microsoft.com/fabric/onelake/onelake-overview" target="_blank">OneLake storage</a></td>
                 <td style="text-align: center; color: #ef4444;">❌</td>
                 <td style="text-align: center; color: #ef4444;">❌</td>
                 <td style="text-align: center; color: #22c55e;">✅</td>
@@ -461,7 +477,7 @@
                 <td style="text-align: center; color: #22c55e;">✅</td>
               </tr>
               <tr>
-                <td>Dataflows</td>
+                <td><a href="https://learn.microsoft.com/fabric/data-factory/dataflows-gen2-overview" target="_blank">Dataflow Gen2</a></td>
                 <td style="text-align: center; color: #ef4444;">❌</td>
                 <td style="text-align: center; color: #22c55e;">⚠️ <a target="_blank" href="https://learn.microsoft.com/en-us/fabric/data-factory/dataflows-gen2-overview#dataflow-features">Gen1 only</a></td>
                 <td style="text-align: center; color: #22c55e;">✅</td>
@@ -478,31 +494,37 @@
                 <td style="text-align: center; color: #22c55e;">✅</td>
                 <td style="text-align: center; color: #22c55e;">✅</td>
               </tr>
+              <tr>
+                <td><a href="https://learn.microsoft.com/fabric/data-science/ds-notebooks" target="_blank">Data Science environment</a></td>
+                <td style="text-align: center; color: #ef4444;">❌</td>
+                <td style="text-align: center; color: #ef4444;">❌</td>
+                <td style="text-align: center; color: #22c55e;">✅</td>
+              </tr>
               
               <!-- Fabric Integration -->
               <tr style="background: rgba(96, 165, 250, 0.05);">
                 <td colspan="4" style="font-weight: 600; color: #dbeafe; padding: 8px;">⚡ Microsoft Fabric Integration</td>
               </tr>
               <tr>
-                <td>Data Factory (pipelines)</td>
+                <td><a href="https://learn.microsoft.com/fabric/data-factory/data-factory-overview" target="_blank">Data Factory (pipelines)</a></td>
                 <td style="text-align: center; color: #ef4444;">❌</td>
                 <td style="text-align: center; color: #ef4444;">❌</td>
                 <td style="text-align: center; color: #22c55e;">✅</td>
               </tr>
               <tr>
-                <td>Synapse Data Engineering</td>
+                <td><a href="https://learn.microsoft.com/fabric/data-engineering/data-engineering-home" target="_blank">Synapse Data Engineering</a></td>
                 <td style="text-align: center; color: #ef4444;">❌</td>
                 <td style="text-align: center; color: #ef4444;">❌</td>
                 <td style="text-align: center; color: #22c55e;">✅</td>
               </tr>
               <tr>
-                <td>Real-Time Analytics</td>
+                <td><a href="https://learn.microsoft.com/fabric/real-time-analytics/real-time-analytics-overview" target="_blank">Real-Time Analytics</a></td>
                 <td style="text-align: center; color: #ef4444;">❌</td>
                 <td style="text-align: center; color: #ef4444;">❌</td>
                 <td style="text-align: center; color: #22c55e;">✅</td>
               </tr>
               <tr>
-                <td>Data Lakehouse & Warehouse</td>
+                <td><a href="https://learn.microsoft.com/fabric/data-warehouse/data-warehouse-overview" target="_blank">Data Lakehouse & Warehouse</a></td>
                 <td style="text-align: center; color: #ef4444;">❌</td>
                 <td style="text-align: center; color: #ef4444;">❌</td>
                 <td style="text-align: center; color: #22c55e;">✅</td>
@@ -519,7 +541,7 @@
                 <td style="text-align: center; color: #22c55e;">✅</td>
               </tr>
               <tr>
-                <td>Multi-geo deployment</td>
+                <td><a href="https://learn.microsoft.com/fabric/admin/region-availability" target="_blank">Multi-geo deployment</a></td>
                 <td style="text-align: center; color: #ef4444;">❌</td>
                 <td style="text-align: center; color: #ef4444;">❌</td>
                 <td style="text-align: center; color: #22c55e;">✅</td>
