@@ -8,10 +8,10 @@
 </head>
 <body>
 <header>
-  <h1><img src="fabric.png" alt="Fabric" style="width: 32px; height: 32px; vertical-align: middle; margin-right: 8px;" />Fabric sizing & PowerBI licensing cost advisor</h1>
+  <h1><img src="fabric.png" alt="Fabric" style="width: 32px; height: 32px; vertical-align: middle; margin-right: 8px;" />Fabric sizing & Power BI licensing cost advisor</h1>
   <div class="sub">
     📚 <a href="https://azure.microsoft.com/en-us/pricing/details/microsoft-fabric/" target="_blank">Official Fabric pricing page</a>
-    <br/> This tool helps to estimate whenever F64 or larger SKUs can reduce PowerBI Pro licensing costs by enabling free viewer licenses.
+    <br/> This tool helps to estimate whenever F64 or larger SKUs can reduce Power BI Pro licensing costs by enabling free viewer licenses.
     <br>Choosing a Fabric capacity goes beyond licensing costs: visit the <a href="https://www.microsoft.com/en-us/microsoft-fabric/capacity-estimator" target="_blank">Fabric Capacity Estimator</a> & the <a href="https://learn.microsoft.com/en-us/fabric/enterprise/powerbi/service-premium-what-is#semantic-model-sku-limitation" target="_blank">semantic model documentation in Fabric</a> for guidance.
   </div>
 </header>
@@ -36,31 +36,7 @@
     <div class="row">
       <div>
         <label>Currency</label>
-        <select id="currencySelect">
-          <option value="EUR">EUR (€)</option>
-          <option value="USD" selected>USD ($)</option>
-          <option value="GBP">GBP (£)</option>
-          <option value="AUD">AUD (A$)</option>
-          <option value="CAD">CAD (C$)</option>
-          <option value="CHF">CHF (CHF)</option>
-          <option value="DKK">DKK (kr)</option>
-          <option value="SEK">SEK (kr)</option>
-          <option value="NOK">NOK (kr)</option>
-          <option value="JPY">JPY (¥)</option>
-          <option value="INR">INR (₹)</option>
-          <option value="SGD">SGD (S$)</option>
-          <option value="NZD">NZD (NZ$)</option>
-          <option value="BRL">BRL (R$)</option>
-          <option value="MXN">MXN (MX$)</option>
-          <option value="ZAR">ZAR (R)</option>
-          <option value="AED">AED (د.إ)</option>
-          <option value="SAR">SAR (﷼)</option>
-          <option value="TRY">TRY (₺)</option>
-          <option value="PLN">PLN (zł)</option>
-          <option value="CZK">CZK (Kč)</option>
-          <option value="HUF">HUF (Ft)</option>
-          <option value="ILS">ILS (₪)</option>
-        </select>
+        <div style="padding: 8px 0; font-weight: 500;">USD ($)</div>
       </div>
       <div>
         <label>PBI <strong>Pro</strong> <a href="https://www.microsoft.com/en-us/power-platform/products/power-bi#Pricing" target="_blank">cost per user / month</a></label>
@@ -89,8 +65,10 @@
     <table class="table" id="capacityTable">
       <thead>
         <tr>
-          <th style="width:60%">Instance name &amp; region</th>
-          <th style="width:35%">Monthly cost</th>
+          <th style="width:30%">F Capacity SKU</th>
+          <th style="width:30%">Region</th>
+          <th style="width:20%">Base monthly cost</th>
+          <th style="width:15%">Reservation</th>
           <th style="width:5%"></th>
         </tr>
       </thead>
@@ -124,7 +102,7 @@
       <div id="comparisonTableWrap">Add capacity options (max 3) to see the table.</div>
     </div>
     <div class="muted" style="margin-top:8px;">
-      Note: Simplified model. Validate licensing/governance in your tenant, <a href="https://azure.microsoft.com/en-us/pricing/details/microsoft-fabric/" target="_blank">Fabric</a> and <a href="https://www.microsoft.com/en-us/power-platform/products/power-bi" target="_blank">PowerBI</a> pricing pages.
+      Note: Simplified model. Validate licensing/governance in your tenant, <a href="https://azure.microsoft.com/en-us/pricing/details/microsoft-fabric/" target="_blank">Fabric</a> and <a href="https://www.microsoft.com/en-us/power-platform/products/power-bi" target="_blank">Power BI</a> pricing pages.
       <br>This document is provided for informational purposes only and does not constitute a formal quotation.
     </div>
 
@@ -157,20 +135,26 @@
   <div id="licensing-tab" class="tab-panel">
     <main class="grid" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
       <section class="card" style="grid-column: 1 / -1;">
-        <h2>Fabric SKU vs PowerBI Licensing</h2>
-        <p class="muted">This table shows the licensing cost impact when moving from PowerBI Pro/PPU to different Fabric SKU sizes, based on estimated team size.</p>
+        <h2>Fabric SKU vs Power BI Licensing</h2>
+        <p class="muted">This table shows the licensing cost impact when moving from Power BI Pro/PPU to different Fabric SKU sizes, based on estimated team size.</p>
         <p class="muted">Note: This document is provided for informational purposes only and does not constitute a formal quotation
-        <br>Example values of "Capacity Cost" down below are based on a "West Europe" Fabric capacity pricing, as of October 2025.
+        <br>Capacity costs are dynamically updated based on your selected region's Fabric pricing.
       </p>
   <hr style="border: none; border-top: 1px solid var(--border); margin: 16px 0;" />
         
         <div class="row" style="margin-bottom: 20px; display: flex; gap: 32px; align-items: flex-end;">
           <div>
-            <label>PowerBI <strong>Pro</strong> <a href="https://www.microsoft.com/en-us/power-platform/products/power-bi#Pricing" target="_blank">cost per user / month in $</a></label>
+            <label>Fabric Region</label>
+            <select id="licenseTableRegion" style="padding: 11px; font-size: 15px; border: 1px solid var(--border); border-radius: 6px; background: #0f172a; color: #f3f4f6; cursor: pointer; min-width: 200px;">
+              <option value="westeurope">West Europe</option>
+            </select>
+          </div>
+          <div>
+            <label>Power BI <strong>Pro</strong> <a href="https://www.microsoft.com/en-us/power-platform/products/power-bi#Pricing" target="_blank">cost per user / month in $</a></label>
             <input id="licenseTableProCost" type="number" min="0" value="14" placeholder="14" />
           </div>
           <div>
-            <label>PowerBI Premium Per User (PPU) <a href="https://www.microsoft.com/en-us/power-platform/products/power-bi#Pricing" target="_blank">cost per user / month in $</a></label>
+            <label>Power BI Premium Per User (PPU) <a href="https://www.microsoft.com/en-us/power-platform/products/power-bi#Pricing" target="_blank">cost per user / month in $</a></label>
             <input id="licenseTablePpuCost" type="number" min="0" value="24" placeholder="24" />
           </div>
         </div>
@@ -194,7 +178,7 @@
           </div>
           <div style="margin-left: 30px; color: #d1fae5; font-size: 13px; line-height: 1.4;">
             💰 Get ~41% off all Fabric capacity costs with <a target="_blank" href="https://learn.microsoft.com/en-us/azure/cost-management-billing/reservations/fabric-capacity" style="color: #2ecd98; text-decoration: underline;">a 1-year commitment</a><br>
-            📈 Improves cost competitiveness vs PowerBI Pro/PPU licensing
+            📈 Improves cost competitiveness vs Power BI Pro/PPU licensing
           </div>
         </div>
         

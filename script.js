@@ -35,6 +35,80 @@
 })();
 
 
+  // --- Pricing Data (Embedded) ---
+  const fabricPricingData = {
+    "metadata": {
+      "source": "Azure Retail Prices API + Microsoft Fabric Pricing Page",
+      "source_url": "https://azure.microsoft.com/en-us/pricing/details/microsoft-fabric/",
+      "currency": "USD",
+      "captured_date": "2026-07-21"
+    },
+    "regions": [
+      {"arm_region_name": "austriaeast", "location_display": "AT East", "payg_per_cu_hour_usd": 0.234, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 341.64}, {"sku": "F4", "payg_monthly_usd": 683.28}, {"sku": "F8", "payg_monthly_usd": 1366.56}, {"sku": "F16", "payg_monthly_usd": 2733.12}, {"sku": "F32", "payg_monthly_usd": 5466.24}, {"sku": "F64", "payg_monthly_usd": 10932.48}, {"sku": "F128", "payg_monthly_usd": 21864.96}, {"sku": "F256", "payg_monthly_usd": 43729.92}, {"sku": "F512", "payg_monthly_usd": 87459.84}, {"sku": "F1024", "payg_monthly_usd": 174919.68}, {"sku": "F2048", "payg_monthly_usd": 349839.36}]},
+      {"arm_region_name": "belgiumcentral", "location_display": "BE Central", "payg_per_cu_hour_usd": 0.234, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 341.64}, {"sku": "F4", "payg_monthly_usd": 683.28}, {"sku": "F8", "payg_monthly_usd": 1366.56}, {"sku": "F16", "payg_monthly_usd": 2733.12}, {"sku": "F32", "payg_monthly_usd": 5466.24}, {"sku": "F64", "payg_monthly_usd": 10932.48}, {"sku": "F128", "payg_monthly_usd": 21864.96}, {"sku": "F256", "payg_monthly_usd": 43729.92}, {"sku": "F512", "payg_monthly_usd": 87459.84}, {"sku": "F1024", "payg_monthly_usd": 174919.68}, {"sku": "F2048", "payg_monthly_usd": 349839.36}]},
+      {"arm_region_name": "brazilsouth", "location_display": "BR South", "payg_per_cu_hour_usd": 0.28, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 408.8}, {"sku": "F4", "payg_monthly_usd": 817.6}, {"sku": "F8", "payg_monthly_usd": 1635.2}, {"sku": "F16", "payg_monthly_usd": 3270.4}, {"sku": "F32", "payg_monthly_usd": 6540.8}, {"sku": "F64", "payg_monthly_usd": 13081.6}, {"sku": "F128", "payg_monthly_usd": 26163.2}, {"sku": "F256", "payg_monthly_usd": 52326.4}, {"sku": "F512", "payg_monthly_usd": 104652.8}, {"sku": "F1024", "payg_monthly_usd": 209305.6}, {"sku": "F2048", "payg_monthly_usd": 418611.2}]},
+      {"arm_region_name": "canadacentral", "location_display": "CA Central", "payg_per_cu_hour_usd": 0.2, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 292.0}, {"sku": "F4", "payg_monthly_usd": 584.0}, {"sku": "F8", "payg_monthly_usd": 1168.0}, {"sku": "F16", "payg_monthly_usd": 2336.0}, {"sku": "F32", "payg_monthly_usd": 4672.0}, {"sku": "F64", "payg_monthly_usd": 9344.0}, {"sku": "F128", "payg_monthly_usd": 18688.0}, {"sku": "F256", "payg_monthly_usd": 37376.0}, {"sku": "F512", "payg_monthly_usd": 74752.0}, {"sku": "F1024", "payg_monthly_usd": 149504.0}, {"sku": "F2048", "payg_monthly_usd": 299008.0}]},
+      {"arm_region_name": "canadaeast", "location_display": "CA East", "payg_per_cu_hour_usd": 0.2, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 292.0}, {"sku": "F4", "payg_monthly_usd": 584.0}, {"sku": "F8", "payg_monthly_usd": 1168.0}, {"sku": "F16", "payg_monthly_usd": 2336.0}, {"sku": "F32", "payg_monthly_usd": 4672.0}, {"sku": "F64", "payg_monthly_usd": 9344.0}, {"sku": "F128", "payg_monthly_usd": 18688.0}, {"sku": "F256", "payg_monthly_usd": 37376.0}, {"sku": "F512", "payg_monthly_usd": 74752.0}, {"sku": "F1024", "payg_monthly_usd": 149504.0}, {"sku": "F2048", "payg_monthly_usd": 299008.0}]},
+      {"arm_region_name": "centralindia", "location_display": "IN Central", "payg_per_cu_hour_usd": 0.2, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 292.0}, {"sku": "F4", "payg_monthly_usd": 584.0}, {"sku": "F8", "payg_monthly_usd": 1168.0}, {"sku": "F16", "payg_monthly_usd": 2336.0}, {"sku": "F32", "payg_monthly_usd": 4672.0}, {"sku": "F64", "payg_monthly_usd": 9344.0}, {"sku": "F128", "payg_monthly_usd": 18688.0}, {"sku": "F256", "payg_monthly_usd": 37376.0}, {"sku": "F512", "payg_monthly_usd": 74752.0}, {"sku": "F1024", "payg_monthly_usd": 149504.0}, {"sku": "F2048", "payg_monthly_usd": 299008.0}]},
+      {"arm_region_name": "centralus", "location_display": "US Central", "payg_per_cu_hour_usd": 0.18, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 262.8}, {"sku": "F4", "payg_monthly_usd": 525.6}, {"sku": "F8", "payg_monthly_usd": 1051.2}, {"sku": "F16", "payg_monthly_usd": 2102.4}, {"sku": "F32", "payg_monthly_usd": 4204.8}, {"sku": "F64", "payg_monthly_usd": 8409.6}, {"sku": "F128", "payg_monthly_usd": 16819.2}, {"sku": "F256", "payg_monthly_usd": 33638.4}, {"sku": "F512", "payg_monthly_usd": 67276.8}, {"sku": "F1024", "payg_monthly_usd": 134553.6}, {"sku": "F2048", "payg_monthly_usd": 269107.2}]},
+      {"arm_region_name": "chilecentral", "location_display": "CL Central", "payg_per_cu_hour_usd": 0.25, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 365.0}, {"sku": "F4", "payg_monthly_usd": 730.0}, {"sku": "F8", "payg_monthly_usd": 1460.0}, {"sku": "F16", "payg_monthly_usd": 2920.0}, {"sku": "F32", "payg_monthly_usd": 5840.0}, {"sku": "F64", "payg_monthly_usd": 11680.0}, {"sku": "F128", "payg_monthly_usd": 23360.0}, {"sku": "F256", "payg_monthly_usd": 46720.0}, {"sku": "F512", "payg_monthly_usd": 93440.0}, {"sku": "F1024", "payg_monthly_usd": 186880.0}, {"sku": "F2048", "payg_monthly_usd": 373760.0}]},
+      {"arm_region_name": "denmarkeast", "location_display": "DK East", "payg_per_cu_hour_usd": 0.234, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 341.64}, {"sku": "F4", "payg_monthly_usd": 683.28}, {"sku": "F8", "payg_monthly_usd": 1366.56}, {"sku": "F16", "payg_monthly_usd": 2733.12}, {"sku": "F32", "payg_monthly_usd": 5466.24}, {"sku": "F64", "payg_monthly_usd": 10932.48}, {"sku": "F128", "payg_monthly_usd": 21864.96}, {"sku": "F256", "payg_monthly_usd": 43729.92}, {"sku": "F512", "payg_monthly_usd": 87459.84}, {"sku": "F1024", "payg_monthly_usd": 174919.68}, {"sku": "F2048", "payg_monthly_usd": 349839.36}]},
+      {"arm_region_name": "eastus", "location_display": "US East", "payg_per_cu_hour_usd": 0.18, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 262.8}, {"sku": "F4", "payg_monthly_usd": 525.6}, {"sku": "F8", "payg_monthly_usd": 1051.2}, {"sku": "F16", "payg_monthly_usd": 2102.4}, {"sku": "F32", "payg_monthly_usd": 4204.8}, {"sku": "F64", "payg_monthly_usd": 8409.6}, {"sku": "F128", "payg_monthly_usd": 16819.2}, {"sku": "F256", "payg_monthly_usd": 33638.4}, {"sku": "F512", "payg_monthly_usd": 67276.8}, {"sku": "F1024", "payg_monthly_usd": 134553.6}, {"sku": "F2048", "payg_monthly_usd": 269107.2}]},
+      {"arm_region_name": "eastus2", "location_display": "US East 2", "payg_per_cu_hour_usd": 0.18, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 262.8}, {"sku": "F4", "payg_monthly_usd": 525.6}, {"sku": "F8", "payg_monthly_usd": 1051.2}, {"sku": "F16", "payg_monthly_usd": 2102.4}, {"sku": "F32", "payg_monthly_usd": 4204.8}, {"sku": "F64", "payg_monthly_usd": 8409.6}, {"sku": "F128", "payg_monthly_usd": 16819.2}, {"sku": "F256", "payg_monthly_usd": 33638.4}, {"sku": "F512", "payg_monthly_usd": 67276.8}, {"sku": "F1024", "payg_monthly_usd": 134553.6}, {"sku": "F2048", "payg_monthly_usd": 269107.2}]},
+      {"arm_region_name": "francecentral", "location_display": "FR Central", "payg_per_cu_hour_usd": 0.2, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 292.0}, {"sku": "F4", "payg_monthly_usd": 584.0}, {"sku": "F8", "payg_monthly_usd": 1168.0}, {"sku": "F16", "payg_monthly_usd": 2336.0}, {"sku": "F32", "payg_monthly_usd": 4672.0}, {"sku": "F64", "payg_monthly_usd": 9344.0}, {"sku": "F128", "payg_monthly_usd": 18688.0}, {"sku": "F256", "payg_monthly_usd": 37376.0}, {"sku": "F512", "payg_monthly_usd": 74752.0}, {"sku": "F1024", "payg_monthly_usd": 149504.0}, {"sku": "F2048", "payg_monthly_usd": 299008.0}]},
+      {"arm_region_name": "francesouth", "location_display": "FR South", "payg_per_cu_hour_usd": 0.26, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 379.6}, {"sku": "F4", "payg_monthly_usd": 759.2}, {"sku": "F8", "payg_monthly_usd": 1518.4}, {"sku": "F16", "payg_monthly_usd": 3036.8}, {"sku": "F32", "payg_monthly_usd": 6073.6}, {"sku": "F64", "payg_monthly_usd": 12147.2}, {"sku": "F128", "payg_monthly_usd": 24294.4}, {"sku": "F256", "payg_monthly_usd": 48588.8}, {"sku": "F512", "payg_monthly_usd": 97177.6}, {"sku": "F1024", "payg_monthly_usd": 194355.2}, {"sku": "F2048", "payg_monthly_usd": 388710.4}]},
+      {"arm_region_name": "germanynorth", "location_display": "DE North", "payg_per_cu_hour_usd": 0.28, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 408.8}, {"sku": "F4", "payg_monthly_usd": 817.6}, {"sku": "F8", "payg_monthly_usd": 1635.2}, {"sku": "F16", "payg_monthly_usd": 3270.4}, {"sku": "F32", "payg_monthly_usd": 6540.8}, {"sku": "F64", "payg_monthly_usd": 13081.6}, {"sku": "F128", "payg_monthly_usd": 26163.2}, {"sku": "F256", "payg_monthly_usd": 52326.4}, {"sku": "F512", "payg_monthly_usd": 104652.8}, {"sku": "F1024", "payg_monthly_usd": 209305.6}, {"sku": "F2048", "payg_monthly_usd": 418611.2}]},
+      {"arm_region_name": "germanywestcentral", "location_display": "DE West Central", "payg_per_cu_hour_usd": 0.22, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 321.2}, {"sku": "F4", "payg_monthly_usd": 642.4}, {"sku": "F8", "payg_monthly_usd": 1284.8}, {"sku": "F16", "payg_monthly_usd": 2569.6}, {"sku": "F32", "payg_monthly_usd": 5139.2}, {"sku": "F64", "payg_monthly_usd": 10278.4}, {"sku": "F128", "payg_monthly_usd": 20556.8}, {"sku": "F256", "payg_monthly_usd": 41113.6}, {"sku": "F512", "payg_monthly_usd": 82227.2}, {"sku": "F1024", "payg_monthly_usd": 164454.4}, {"sku": "F2048", "payg_monthly_usd": 328908.8}]},
+      {"arm_region_name": "israelcentral", "location_display": "IL Central", "payg_per_cu_hour_usd": 0.2, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 292.0}, {"sku": "F4", "payg_monthly_usd": 584.0}, {"sku": "F8", "payg_monthly_usd": 1168.0}, {"sku": "F16", "payg_monthly_usd": 2336.0}, {"sku": "F32", "payg_monthly_usd": 4672.0}, {"sku": "F64", "payg_monthly_usd": 9344.0}, {"sku": "F128", "payg_monthly_usd": 18688.0}, {"sku": "F256", "payg_monthly_usd": 37376.0}, {"sku": "F512", "payg_monthly_usd": 74752.0}, {"sku": "F1024", "payg_monthly_usd": 149504.0}, {"sku": "F2048", "payg_monthly_usd": 299008.0}]},
+      {"arm_region_name": "israelnorthwest", "location_display": "IL Northwest", "payg_per_cu_hour_usd": 0.2574, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 375.804}, {"sku": "F4", "payg_monthly_usd": 751.608}, {"sku": "F8", "payg_monthly_usd": 1503.216}, {"sku": "F16", "payg_monthly_usd": 3006.432}, {"sku": "F32", "payg_monthly_usd": 6012.864}, {"sku": "F64", "payg_monthly_usd": 12025.728}, {"sku": "F128", "payg_monthly_usd": 24051.456}, {"sku": "F256", "payg_monthly_usd": 48102.912}, {"sku": "F512", "payg_monthly_usd": 96205.824}, {"sku": "F1024", "payg_monthly_usd": 192411.648}, {"sku": "F2048", "payg_monthly_usd": 384823.296}]},
+      {"arm_region_name": "italynorth", "location_display": "IT North", "payg_per_cu_hour_usd": 0.21, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 306.6}, {"sku": "F4", "payg_monthly_usd": 613.2}, {"sku": "F8", "payg_monthly_usd": 1226.4}, {"sku": "F16", "payg_monthly_usd": 2452.8}, {"sku": "F32", "payg_monthly_usd": 4905.6}, {"sku": "F64", "payg_monthly_usd": 9811.2}, {"sku": "F128", "payg_monthly_usd": 19622.4}, {"sku": "F256", "payg_monthly_usd": 39244.8}, {"sku": "F512", "payg_monthly_usd": 78489.6}, {"sku": "F1024", "payg_monthly_usd": 156979.2}, {"sku": "F2048", "payg_monthly_usd": 313958.4}]},
+      {"arm_region_name": "mexicocentral", "location_display": "MX Central", "payg_per_cu_hour_usd": 0.19, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 277.4}, {"sku": "F4", "payg_monthly_usd": 554.8}, {"sku": "F8", "payg_monthly_usd": 1109.6}, {"sku": "F16", "payg_monthly_usd": 2219.2}, {"sku": "F32", "payg_monthly_usd": 4438.4}, {"sku": "F64", "payg_monthly_usd": 8876.8}, {"sku": "F128", "payg_monthly_usd": 17753.6}, {"sku": "F256", "payg_monthly_usd": 35507.2}, {"sku": "F512", "payg_monthly_usd": 71014.4}, {"sku": "F1024", "payg_monthly_usd": 142028.8}, {"sku": "F2048", "payg_monthly_usd": 284057.6}]},
+      {"arm_region_name": "newzealandnorth", "location_display": "NZ North", "payg_per_cu_hour_usd": 0.22, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 321.2}, {"sku": "F4", "payg_monthly_usd": 642.4}, {"sku": "F8", "payg_monthly_usd": 1284.8}, {"sku": "F16", "payg_monthly_usd": 2569.6}, {"sku": "F32", "payg_monthly_usd": 5139.2}, {"sku": "F64", "payg_monthly_usd": 10278.4}, {"sku": "F128", "payg_monthly_usd": 20556.8}, {"sku": "F256", "payg_monthly_usd": 41113.6}, {"sku": "F512", "payg_monthly_usd": 82227.2}, {"sku": "F1024", "payg_monthly_usd": 164454.4}, {"sku": "F2048", "payg_monthly_usd": 328908.8}]},
+      {"arm_region_name": "northcentralus", "location_display": "US North Central", "payg_per_cu_hour_usd": 0.18, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 262.8}, {"sku": "F4", "payg_monthly_usd": 525.6}, {"sku": "F8", "payg_monthly_usd": 1051.2}, {"sku": "F16", "payg_monthly_usd": 2102.4}, {"sku": "F32", "payg_monthly_usd": 4204.8}, {"sku": "F64", "payg_monthly_usd": 8409.6}, {"sku": "F128", "payg_monthly_usd": 16819.2}, {"sku": "F256", "payg_monthly_usd": 33638.4}, {"sku": "F512", "payg_monthly_usd": 67276.8}, {"sku": "F1024", "payg_monthly_usd": 134553.6}, {"sku": "F2048", "payg_monthly_usd": 269107.2}]},
+      {"arm_region_name": "northeurope", "location_display": "EU North", "payg_per_cu_hour_usd": 0.19, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 277.4}, {"sku": "F4", "payg_monthly_usd": 554.8}, {"sku": "F8", "payg_monthly_usd": 1109.6}, {"sku": "F16", "payg_monthly_usd": 2219.2}, {"sku": "F32", "payg_monthly_usd": 4438.4}, {"sku": "F64", "payg_monthly_usd": 8876.8}, {"sku": "F128", "payg_monthly_usd": 17753.6}, {"sku": "F256", "payg_monthly_usd": 35507.2}, {"sku": "F512", "payg_monthly_usd": 71014.4}, {"sku": "F1024", "payg_monthly_usd": 142028.8}, {"sku": "F2048", "payg_monthly_usd": 284057.6}]},
+      {"arm_region_name": "norwayeast", "location_display": "NO East", "payg_per_cu_hour_usd": 0.24, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 350.4}, {"sku": "F4", "payg_monthly_usd": 700.8}, {"sku": "F8", "payg_monthly_usd": 1401.6}, {"sku": "F16", "payg_monthly_usd": 2803.2}, {"sku": "F32", "payg_monthly_usd": 5606.4}, {"sku": "F64", "payg_monthly_usd": 11212.8}, {"sku": "F128", "payg_monthly_usd": 22425.6}, {"sku": "F256", "payg_monthly_usd": 44851.2}, {"sku": "F512", "payg_monthly_usd": 89702.4}, {"sku": "F1024", "payg_monthly_usd": 179404.8}, {"sku": "F2048", "payg_monthly_usd": 358809.6}]},
+      {"arm_region_name": "norwaywest", "location_display": "NO West", "payg_per_cu_hour_usd": 0.31, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 452.6}, {"sku": "F4", "payg_monthly_usd": 905.2}, {"sku": "F8", "payg_monthly_usd": 1810.4}, {"sku": "F16", "payg_monthly_usd": 3620.8}, {"sku": "F32", "payg_monthly_usd": 7241.6}, {"sku": "F64", "payg_monthly_usd": 14483.2}, {"sku": "F128", "payg_monthly_usd": 28966.4}, {"sku": "F256", "payg_monthly_usd": 57932.8}, {"sku": "F512", "payg_monthly_usd": 115865.6}, {"sku": "F1024", "payg_monthly_usd": 231731.2}, {"sku": "F2048", "payg_monthly_usd": 463462.4}]},
+      {"arm_region_name": "polandcentral", "location_display": "PL Central", "payg_per_cu_hour_usd": 0.22, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 321.2}, {"sku": "F4", "payg_monthly_usd": 642.4}, {"sku": "F8", "payg_monthly_usd": 1284.8}, {"sku": "F16", "payg_monthly_usd": 2569.6}, {"sku": "F32", "payg_monthly_usd": 5139.2}, {"sku": "F64", "payg_monthly_usd": 10278.4}, {"sku": "F128", "payg_monthly_usd": 20556.8}, {"sku": "F256", "payg_monthly_usd": 41113.6}, {"sku": "F512", "payg_monthly_usd": 82227.2}, {"sku": "F1024", "payg_monthly_usd": 164454.4}, {"sku": "F2048", "payg_monthly_usd": 328908.8}]},
+      {"arm_region_name": "qatarcentral", "location_display": "QA Central", "payg_per_cu_hour_usd": 0.22, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 321.2}, {"sku": "F4", "payg_monthly_usd": 642.4}, {"sku": "F8", "payg_monthly_usd": 1284.8}, {"sku": "F16", "payg_monthly_usd": 2569.6}, {"sku": "F32", "payg_monthly_usd": 5139.2}, {"sku": "F64", "payg_monthly_usd": 10278.4}, {"sku": "F128", "payg_monthly_usd": 20556.8}, {"sku": "F256", "payg_monthly_usd": 41113.6}, {"sku": "F512", "payg_monthly_usd": 82227.2}, {"sku": "F1024", "payg_monthly_usd": 164454.4}, {"sku": "F2048", "payg_monthly_usd": 328908.8}]},
+      {"arm_region_name": "southafricanorth", "location_display": "ZA North", "payg_per_cu_hour_usd": 0.24, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 350.4}, {"sku": "F4", "payg_monthly_usd": 700.8}, {"sku": "F8", "payg_monthly_usd": 1401.6}, {"sku": "F16", "payg_monthly_usd": 2803.2}, {"sku": "F32", "payg_monthly_usd": 5606.4}, {"sku": "F64", "payg_monthly_usd": 11212.8}, {"sku": "F128", "payg_monthly_usd": 22425.6}, {"sku": "F256", "payg_monthly_usd": 44851.2}, {"sku": "F512", "payg_monthly_usd": 89702.4}, {"sku": "F1024", "payg_monthly_usd": 179404.8}, {"sku": "F2048", "payg_monthly_usd": 358809.6}]},
+      {"arm_region_name": "southafricawest", "location_display": "ZA West", "payg_per_cu_hour_usd": 0.31, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 452.6}, {"sku": "F4", "payg_monthly_usd": 905.2}, {"sku": "F8", "payg_monthly_usd": 1810.4}, {"sku": "F16", "payg_monthly_usd": 3620.8}, {"sku": "F32", "payg_monthly_usd": 7241.6}, {"sku": "F64", "payg_monthly_usd": 14483.2}, {"sku": "F128", "payg_monthly_usd": 28966.4}, {"sku": "F256", "payg_monthly_usd": 57932.8}, {"sku": "F512", "payg_monthly_usd": 115865.6}, {"sku": "F1024", "payg_monthly_usd": 231731.2}, {"sku": "F2048", "payg_monthly_usd": 463462.4}]},
+      {"arm_region_name": "southcentralus", "location_display": "US South Central", "payg_per_cu_hour_usd": 0.18, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 262.8}, {"sku": "F4", "payg_monthly_usd": 525.6}, {"sku": "F8", "payg_monthly_usd": 1051.2}, {"sku": "F16", "payg_monthly_usd": 2102.4}, {"sku": "F32", "payg_monthly_usd": 4204.8}, {"sku": "F64", "payg_monthly_usd": 8409.6}, {"sku": "F128", "payg_monthly_usd": 16819.2}, {"sku": "F256", "payg_monthly_usd": 33638.4}, {"sku": "F512", "payg_monthly_usd": 67276.8}, {"sku": "F1024", "payg_monthly_usd": 134553.6}, {"sku": "F2048", "payg_monthly_usd": 269107.2}]},
+      {"arm_region_name": "southindia", "location_display": "IN South", "payg_per_cu_hour_usd": 0.22, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 321.2}, {"sku": "F4", "payg_monthly_usd": 642.4}, {"sku": "F8", "payg_monthly_usd": 1284.8}, {"sku": "F16", "payg_monthly_usd": 2569.6}, {"sku": "F32", "payg_monthly_usd": 5139.2}, {"sku": "F64", "payg_monthly_usd": 10278.4}, {"sku": "F128", "payg_monthly_usd": 20556.8}, {"sku": "F256", "payg_monthly_usd": 41113.6}, {"sku": "F512", "payg_monthly_usd": 82227.2}, {"sku": "F1024", "payg_monthly_usd": 164454.4}, {"sku": "F2048", "payg_monthly_usd": 328908.8}]},
+      {"arm_region_name": "spaincentral", "location_display": "ES Central", "payg_per_cu_hour_usd": 0.19, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 277.4}, {"sku": "F4", "payg_monthly_usd": 554.8}, {"sku": "F8", "payg_monthly_usd": 1109.6}, {"sku": "F16", "payg_monthly_usd": 2219.2}, {"sku": "F32", "payg_monthly_usd": 4438.4}, {"sku": "F64", "payg_monthly_usd": 8876.8}, {"sku": "F128", "payg_monthly_usd": 17753.6}, {"sku": "F256", "payg_monthly_usd": 35507.2}, {"sku": "F512", "payg_monthly_usd": 71014.4}, {"sku": "F1024", "payg_monthly_usd": 142028.8}, {"sku": "F2048", "payg_monthly_usd": 284057.6}]},
+      {"arm_region_name": "swedencentral", "location_display": "SE Central", "payg_per_cu_hour_usd": 0.19, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 277.4}, {"sku": "F4", "payg_monthly_usd": 554.8}, {"sku": "F8", "payg_monthly_usd": 1109.6}, {"sku": "F16", "payg_monthly_usd": 2219.2}, {"sku": "F32", "payg_monthly_usd": 4438.4}, {"sku": "F64", "payg_monthly_usd": 8876.8}, {"sku": "F128", "payg_monthly_usd": 17753.6}, {"sku": "F256", "payg_monthly_usd": 35507.2}, {"sku": "F512", "payg_monthly_usd": 71014.4}, {"sku": "F1024", "payg_monthly_usd": 142028.8}, {"sku": "F2048", "payg_monthly_usd": 284057.6}]},
+      {"arm_region_name": "switzerlandnorth", "location_display": "CH North", "payg_per_cu_hour_usd": 0.23, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 335.8}, {"sku": "F4", "payg_monthly_usd": 671.6}, {"sku": "F8", "payg_monthly_usd": 1343.2}, {"sku": "F16", "payg_monthly_usd": 2686.4}, {"sku": "F32", "payg_monthly_usd": 5372.8}, {"sku": "F64", "payg_monthly_usd": 10745.6}, {"sku": "F128", "payg_monthly_usd": 21491.2}, {"sku": "F256", "payg_monthly_usd": 42982.4}, {"sku": "F512", "payg_monthly_usd": 85964.8}, {"sku": "F1024", "payg_monthly_usd": 171929.6}, {"sku": "F2048", "payg_monthly_usd": 343859.2}]},
+      {"arm_region_name": "switzerlandwest", "location_display": "CH West", "payg_per_cu_hour_usd": 0.29, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 423.4}, {"sku": "F4", "payg_monthly_usd": 846.8}, {"sku": "F8", "payg_monthly_usd": 1693.6}, {"sku": "F16", "payg_monthly_usd": 3387.2}, {"sku": "F32", "payg_monthly_usd": 6774.4}, {"sku": "F64", "payg_monthly_usd": 13548.8}, {"sku": "F128", "payg_monthly_usd": 27097.6}, {"sku": "F256", "payg_monthly_usd": 54195.2}, {"sku": "F512", "payg_monthly_usd": 108390.4}, {"sku": "F1024", "payg_monthly_usd": 216780.8}, {"sku": "F2048", "payg_monthly_usd": 433561.6}]},
+      {"arm_region_name": "uaecentral", "location_display": "AE Central", "payg_per_cu_hour_usd": 0.28, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 408.8}, {"sku": "F4", "payg_monthly_usd": 817.6}, {"sku": "F8", "payg_monthly_usd": 1635.2}, {"sku": "F16", "payg_monthly_usd": 3270.4}, {"sku": "F32", "payg_monthly_usd": 6540.8}, {"sku": "F64", "payg_monthly_usd": 13081.6}, {"sku": "F128", "payg_monthly_usd": 26163.2}, {"sku": "F256", "payg_monthly_usd": 52326.4}, {"sku": "F512", "payg_monthly_usd": 104652.8}, {"sku": "F1024", "payg_monthly_usd": 209305.6}, {"sku": "F2048", "payg_monthly_usd": 418611.2}]},
+      {"arm_region_name": "uaenorth", "location_display": "AE North", "payg_per_cu_hour_usd": 0.22, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 321.2}, {"sku": "F4", "payg_monthly_usd": 642.4}, {"sku": "F8", "payg_monthly_usd": 1284.8}, {"sku": "F16", "payg_monthly_usd": 2569.6}, {"sku": "F32", "payg_monthly_usd": 5139.2}, {"sku": "F64", "payg_monthly_usd": 10278.4}, {"sku": "F128", "payg_monthly_usd": 20556.8}, {"sku": "F256", "payg_monthly_usd": 41113.6}, {"sku": "F512", "payg_monthly_usd": 82227.2}, {"sku": "F1024", "payg_monthly_usd": 164454.4}, {"sku": "F2048", "payg_monthly_usd": 328908.8}]},
+      {"arm_region_name": "uksouth", "location_display": "UK South", "payg_per_cu_hour_usd": 0.21, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 306.6}, {"sku": "F4", "payg_monthly_usd": 613.2}, {"sku": "F8", "payg_monthly_usd": 1226.4}, {"sku": "F16", "payg_monthly_usd": 2452.8}, {"sku": "F32", "payg_monthly_usd": 4905.6}, {"sku": "F64", "payg_monthly_usd": 9811.2}, {"sku": "F128", "payg_monthly_usd": 19622.4}, {"sku": "F256", "payg_monthly_usd": 39244.8}, {"sku": "F512", "payg_monthly_usd": 78489.6}, {"sku": "F1024", "payg_monthly_usd": 156979.2}, {"sku": "F2048", "payg_monthly_usd": 313958.4}]},
+      {"arm_region_name": "ukwest", "location_display": "UK West", "payg_per_cu_hour_usd": 0.21, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 306.6}, {"sku": "F4", "payg_monthly_usd": 613.2}, {"sku": "F8", "payg_monthly_usd": 1226.4}, {"sku": "F16", "payg_monthly_usd": 2452.8}, {"sku": "F32", "payg_monthly_usd": 4905.6}, {"sku": "F64", "payg_monthly_usd": 9811.2}, {"sku": "F128", "payg_monthly_usd": 19622.4}, {"sku": "F256", "payg_monthly_usd": 39244.8}, {"sku": "F512", "payg_monthly_usd": 78489.6}, {"sku": "F1024", "payg_monthly_usd": 156979.2}, {"sku": "F2048", "payg_monthly_usd": 313958.4}]},
+      {"arm_region_name": "westcentralus", "location_display": "US West Central", "payg_per_cu_hour_usd": 0.2, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 292.0}, {"sku": "F4", "payg_monthly_usd": 584.0}, {"sku": "F8", "payg_monthly_usd": 1168.0}, {"sku": "F16", "payg_monthly_usd": 2336.0}, {"sku": "F32", "payg_monthly_usd": 4672.0}, {"sku": "F64", "payg_monthly_usd": 9344.0}, {"sku": "F128", "payg_monthly_usd": 18688.0}, {"sku": "F256", "payg_monthly_usd": 37376.0}, {"sku": "F512", "payg_monthly_usd": 74752.0}, {"sku": "F1024", "payg_monthly_usd": 149504.0}, {"sku": "F2048", "payg_monthly_usd": 299008.0}]},
+      {"arm_region_name": "westeurope", "location_display": "EU West", "payg_per_cu_hour_usd": 0.22, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 321.2}, {"sku": "F4", "payg_monthly_usd": 642.4}, {"sku": "F8", "payg_monthly_usd": 1284.8}, {"sku": "F16", "payg_monthly_usd": 2569.6}, {"sku": "F32", "payg_monthly_usd": 5139.2}, {"sku": "F64", "payg_monthly_usd": 10278.4}, {"sku": "F128", "payg_monthly_usd": 20556.8}, {"sku": "F256", "payg_monthly_usd": 41113.6}, {"sku": "F512", "payg_monthly_usd": 82227.2}, {"sku": "F1024", "payg_monthly_usd": 164454.4}, {"sku": "F2048", "payg_monthly_usd": 328908.8}]},
+      {"arm_region_name": "westindia", "location_display": "IN West", "payg_per_cu_hour_usd": 0.2, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 292.0}, {"sku": "F4", "payg_monthly_usd": 584.0}, {"sku": "F8", "payg_monthly_usd": 1168.0}, {"sku": "F16", "payg_monthly_usd": 2336.0}, {"sku": "F32", "payg_monthly_usd": 4672.0}, {"sku": "F64", "payg_monthly_usd": 9344.0}, {"sku": "F128", "payg_monthly_usd": 18688.0}, {"sku": "F256", "payg_monthly_usd": 37376.0}, {"sku": "F512", "payg_monthly_usd": 74752.0}, {"sku": "F1024", "payg_monthly_usd": 149504.0}, {"sku": "F2048", "payg_monthly_usd": 299008.0}]},
+      {"arm_region_name": "westus", "location_display": "US West", "payg_per_cu_hour_usd": 0.2, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 292.0}, {"sku": "F4", "payg_monthly_usd": 584.0}, {"sku": "F8", "payg_monthly_usd": 1168.0}, {"sku": "F16", "payg_monthly_usd": 2336.0}, {"sku": "F32", "payg_monthly_usd": 4672.0}, {"sku": "F64", "payg_monthly_usd": 9344.0}, {"sku": "F128", "payg_monthly_usd": 18688.0}, {"sku": "F256", "payg_monthly_usd": 37376.0}, {"sku": "F512", "payg_monthly_usd": 74752.0}, {"sku": "F1024", "payg_monthly_usd": 149504.0}, {"sku": "F2048", "payg_monthly_usd": 299008.0}]},
+      {"arm_region_name": "westus2", "location_display": "US West 2", "payg_per_cu_hour_usd": 0.18, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 262.8}, {"sku": "F4", "payg_monthly_usd": 525.6}, {"sku": "F8", "payg_monthly_usd": 1051.2}, {"sku": "F16", "payg_monthly_usd": 2102.4}, {"sku": "F32", "payg_monthly_usd": 4204.8}, {"sku": "F64", "payg_monthly_usd": 8409.6}, {"sku": "F128", "payg_monthly_usd": 16819.2}, {"sku": "F256", "payg_monthly_usd": 33638.4}, {"sku": "F512", "payg_monthly_usd": 67276.8}, {"sku": "F1024", "payg_monthly_usd": 134553.6}, {"sku": "F2048", "payg_monthly_usd": 269107.2}]},
+      {"arm_region_name": "westus3", "location_display": "US West 3", "payg_per_cu_hour_usd": 0.18, "capacity_skus": [{"sku": "F2", "payg_monthly_usd": 262.8}, {"sku": "F4", "payg_monthly_usd": 525.6}, {"sku": "F8", "payg_monthly_usd": 1051.2}, {"sku": "F16", "payg_monthly_usd": 2102.4}, {"sku": "F32", "payg_monthly_usd": 4204.8}, {"sku": "F64", "payg_monthly_usd": 8409.6}, {"sku": "F128", "payg_monthly_usd": 16819.2}, {"sku": "F256", "payg_monthly_usd": 33638.4}, {"sku": "F512", "payg_monthly_usd": 67276.8}, {"sku": "F1024", "payg_monthly_usd": 134553.6}, {"sku": "F2048", "payg_monthly_usd": 269107.2}]}
+    ]
+  };
+
+  function getPricingForCapacityAndRegion(skuName, armRegionName) {
+    if (!fabricPricingData || !fabricPricingData.regions) return null;
+    
+    const regionData = fabricPricingData.regions.find(r => r.arm_region_name === armRegionName);
+    if (!regionData) return null;
+
+    const skuData = regionData.capacity_skus?.find(s => s.sku === skuName);
+    if (!skuData) return null;
+
+    return {
+      skuName: skuData.sku,
+      region: regionData.location_display,
+      payg_monthly_usd: skuData.payg_monthly_usd,
+      reservation_1yr_monthly_usd: skuData.reservation_1yr_monthly_usd,
+      reservation_3yr_monthly_usd: skuData.reservation_3yr_monthly_usd
+    };
+  }
+
   // --- State ---
   const state = {
     currencyCode: "USD",
@@ -54,40 +128,86 @@
     "TRY": "₺","PLN": "zł","CZK": "Kč","HUF": "Ft","ILS": "₪"
   };
 
-  const fabricRegions = [
-    "Australia East",
-    "Australia Southeast",
-    "Brazil South",
-    "Canada Central",
-    "Canada East",
-    "Central India",
-    "Central US",
-    "East Asia",
-    "East US",
-    "East US 2",
-    "France Central",
-    "Germany West Central",
-    "Japan East",
-    "Japan West",
-    "Korea Central",
-    "North Central US",
-    "North Europe",
-    "Norway East",
-    "South Africa North",
-    "South Central US",
-    "South India",
-    "Southeast Asia",
-    "Sweden Central",
-    "Switzerland North",
-    "UAE North",
-    "UK South",
-    "UK West",
-    "West Central US",
-    "West Europe",
-    "West US",
-    "West US 2",
-    "West US 3"
-  ];
+  const regionMeta = {
+    "austriaeast":        { display: "Austria East",          continent: "Europe" },
+    "belgiumcentral":     { display: "Belgium Central",       continent: "Europe" },
+    "brazilsouth":        { display: "Brazil South",          continent: "South America" },
+    "canadacentral":      { display: "Canada Central",        continent: "North America" },
+    "canadaeast":         { display: "Canada East",           continent: "North America" },
+    "centralindia":       { display: "India Central",         continent: "Asia Pacific" },
+    "centralus":          { display: "Central US",            continent: "North America" },
+    "chilecentral":       { display: "Chile Central",         continent: "South America" },
+    "denmarkeast":        { display: "Denmark East",          continent: "Europe" },
+    "eastus":             { display: "East US",               continent: "North America" },
+    "eastus2":            { display: "East US 2",             continent: "North America" },
+    "francecentral":      { display: "France Central",        continent: "Europe" },
+    "francesouth":        { display: "France South",          continent: "Europe" },
+    "germanynorth":       { display: "Germany North",         continent: "Europe" },
+    "germanywestcentral": { display: "Germany West Central",  continent: "Europe" },
+    "israelcentral":      { display: "Israel Central",        continent: "Middle East" },
+    "israelnorthwest":    { display: "Israel Northwest",      continent: "Middle East" },
+    "italynorth":         { display: "Italy North",           continent: "Europe" },
+    "mexicocentral":      { display: "Mexico Central",        continent: "North America" },
+    "newzealandnorth":    { display: "New Zealand North",     continent: "Asia Pacific" },
+    "northcentralus":     { display: "North Central US",      continent: "North America" },
+    "northeurope":        { display: "North Europe",          continent: "Europe" },
+    "norwayeast":         { display: "Norway East",           continent: "Europe" },
+    "norwaywest":         { display: "Norway West",           continent: "Europe" },
+    "polandcentral":      { display: "Poland Central",        continent: "Europe" },
+    "qatarcentral":       { display: "Qatar Central",         continent: "Middle East" },
+    "southafricanorth":   { display: "South Africa North",    continent: "Africa" },
+    "southafricawest":    { display: "South Africa West",     continent: "Africa" },
+    "southcentralus":     { display: "South Central US",      continent: "North America" },
+    "southindia":         { display: "South India",           continent: "Asia Pacific" },
+    "spaincentral":       { display: "Spain Central",         continent: "Europe" },
+    "swedencentral":      { display: "Sweden Central",        continent: "Europe" },
+    "switzerlandnorth":   { display: "Switzerland North",     continent: "Europe" },
+    "switzerlandwest":    { display: "Switzerland West",      continent: "Europe" },
+    "uaecentral":         { display: "UAE Central",           continent: "Middle East" },
+    "uaenorth":           { display: "UAE North",             continent: "Middle East" },
+    "uksouth":            { display: "UK South",              continent: "Europe" },
+    "ukwest":             { display: "UK West",               continent: "Europe" },
+    "westcentralus":      { display: "West Central US",       continent: "North America" },
+    "westeurope":         { display: "West Europe",           continent: "Europe" },
+    "westindia":          { display: "West India",            continent: "Asia Pacific" },
+    "westus":             { display: "West US",               continent: "North America" },
+    "westus2":            { display: "West US 2",             continent: "North America" },
+    "westus3":            { display: "West US 3",             continent: "North America" },
+  };
+
+  function getRegionDisplay(armName) {
+    return (regionMeta[armName] && regionMeta[armName].display) || armName;
+  }
+
+  function buildGroupedRegionOptions(selectedArm) {
+    const continentOrder = ["Africa", "Asia Pacific", "Europe", "Middle East", "North America", "South America"];
+    const groups = {};
+    continentOrder.forEach(c => { groups[c] = []; });
+    fabricPricingData.regions.forEach(r => {
+      const meta = regionMeta[r.arm_region_name];
+      if (!meta) return;
+      groups[meta.continent].push({ arm: r.arm_region_name, display: meta.display });
+    });
+    Object.values(groups).forEach(arr => arr.sort((a, b) => a.display.localeCompare(b.display)));
+    let html = '<option value="">— Select region —</option>';
+    continentOrder.forEach(continent => {
+      if (groups[continent].length === 0) return;
+      html += `<optgroup label="${continent}">`;
+      groups[continent].forEach(r => {
+        html += `<option value="${r.arm}"${r.arm === selectedArm ? ' selected' : ''}>${r.display}</option>`;
+      });
+      html += '</optgroup>';
+    });
+    return html;
+  }
+
+  function getAvailableRegions() {
+    if (!fabricPricingData || !fabricPricingData.regions) return [];
+    return fabricPricingData.regions.map(r => ({
+      arm_region_name: r.arm_region_name,
+      location_display: getRegionDisplay(r.arm_region_name)
+    })).sort((a, b) => a.location_display.localeCompare(b.location_display));
+  }
 
   // --- Helpers ---
   const fmt = (v) => Number.isFinite(v) ? v.toLocaleString(undefined, {maximumFractionDigits: 2}) : "—";
@@ -120,7 +240,11 @@
       .slice(0, state.maxInstances)
       .map(c => {
         const vUnit = viewerUnitCost(c.name);
-        const cap = c.monthlyCost || 0;
+        let cap = c.monthlyCost || 0;
+        // Apply 41% reservation discount (59% of original cost) if enabled
+        if (c.hasReservation) {
+          cap = cap * 0.59;
+        }
         const buildersCost = state.builders * state.proCost;
         const viewersCost = state.viewers * vUnit;
         const total = cap + buildersCost + viewersCost;
@@ -129,6 +253,8 @@
           name: c.name || "(unnamed)",
           region: c.region || "",
           monthlyCost: cap,
+          originalMonthlyCost: c.monthlyCost || 0,
+          hasReservation: c.hasReservation,
           viewerUnitCost: vUnit,
           buildersCost,
           viewersCost,
@@ -218,14 +344,15 @@
 
   // --- UI Wiring ---
   function readInputs() {
-    state.currencyCode = byId("currencySelect").value;
-    state.currencySymbol = currencyMap[state.currencyCode] || "$";
+    // Currency locked to USD
+    state.currencyCode = "USD";
+    state.currencySymbol = "$";
     state.viewers = Number(byId("viewerCount").value) || 0;
     state.builders = Number(byId("builderCount").value) || 0;
     state.proCost = Number(byId("proCost").value) || 0;
     updateKPIs();
   }
-  ["currencySelect","viewerCount","builderCount","proCost"]
+  ["viewerCount","builderCount","proCost"]
     .forEach(id => byId(id).addEventListener("input", readInputs));
 
   const tbody = byId("capacityTbody");
@@ -236,7 +363,7 @@
     addBtn.disabled = state.capacities.length >= state.maxInstances;
   }
 
-  function addCapacityRow(name = "", monthlyCost = "", region) {
+  function addCapacityRow(name = "", monthlyCost = "", region = "") {
     if (state.capacities.length >= state.maxInstances) {
       updateAddButtonState();
       updateKPIs();
@@ -246,55 +373,87 @@
     const fabricSKUs = [
       "F2", "F4", "F8", "F16", "F32", "F64", "F128", "F256", "F512", "F1024", "F2048"
     ];
-    const selectedSKU = fabricSKUs.includes(name) ? name : fabricSKUs[0];  
-    const options = fabricSKUs.map(
+    const selectedSKU = fabricSKUs.includes(name) ? name : fabricSKUs[0];
+    const skuOptions = fabricSKUs.map(
       sku => `<option value="${sku}"${sku === selectedSKU ? " selected" : ""}>${sku}</option>`
     ).join("");
 
-  const initialRegion = (typeof region === "string" ? region : "").trim();
-
+    const initialRegion = (typeof region === "string" ? region : "").trim();
 
     const id = capIdCounter++;
     const row = document.createElement("tr");
     row.dataset.id = id;
 
-    state.capacities.push({ id, name: selectedSKU, region: initialRegion, monthlyCost: Number(monthlyCost) || 0 });
+    // Calculate initial cost
+    let initialCost = monthlyCost;
+    if (!initialCost && initialRegion && selectedSKU && fabricPricingData) {
+      const pricing = getPricingForCapacityAndRegion(selectedSKU, initialRegion);
+      if (pricing) {
+        initialCost = pricing.payg_monthly_usd;
+      }
+    }
+
+    state.capacities.push({ 
+      id, 
+      name: selectedSKU, 
+      region: initialRegion, 
+      monthlyCost: Number(initialCost) || 0,
+      hasReservation: false
+    });
 
     row.innerHTML = `
       <td>
-        <div class="instance-inputs">
-          <select>${options}</select>
-          <select data-role="region">
-            <option value="">Region (optional)</option>
-            ${fabricRegions.map(r => `<option value="${r}">${r}</option>`).join("")}
-          </select>
-        </div>
+        <select>${skuOptions}</select>
       </td>
-      <td><input type="integer" min="0" placeholder="0.0" value="${monthlyCost}" data-role="cost" /></td>
-      <td class="right"><button class="del">Remove</button></td>
+      <td>
+        <select data-role="region">${buildGroupedRegionOptions(initialRegion)}</select>
+      </td>
+      <td><input type="text" readonly tabindex="-1" value="${Math.round(Number(initialCost) || 0).toLocaleString()}" data-role="cost" style="text-align:right; background: #0d1727; color: #94a3b8; cursor: default; border-color: #1f2937; pointer-events: none;" /></td>
+      <td style="text-align:center;"><input type="checkbox" data-role="reservation" style="width: 18px; height: 18px; cursor: pointer; accent-color: #10b981;" /></td>
+      <td class="right"><button class="del" style="padding: 4px 8px; font-size: 16px; min-width: 24px;">−</button></td>
     `;
 
     const skuSelect = row.querySelector("select");
-  const regionSelect = row.querySelector('select[data-role="region"]');
+    const regionSelect = row.querySelector('select[data-role="region"]');
     const costInput = row.querySelector('input[data-role="cost"]');
+    const reservationCheckbox = row.querySelector('input[data-role="reservation"]');
     const delBtn = row.querySelector("button.del");
 
-  if (regionSelect) regionSelect.value = initialRegion;
+
+
+    const updateCostFromPricing = () => {
+      const currentSKU = skuSelect.value;
+      const currentRegion = regionSelect.value;
+      if (currentSKU && currentRegion && fabricPricingData) {
+        const pricing = getPricingForCapacityAndRegion(currentSKU, currentRegion);
+        if (pricing) {
+          costInput.value = Math.round(pricing.payg_monthly_usd).toLocaleString();
+          const cap = state.capacities.find(c => c.id === id);
+          if (cap) cap.monthlyCost = pricing.payg_monthly_usd;
+          updateKPIs();
+          return;
+        }
+      }
+    };
+
     skuSelect.addEventListener("change", () => {
       const cap = state.capacities.find(c => c.id === id);
       if (cap) cap.name = skuSelect.value;
-      updateKPIs();
+      updateCostFromPricing();
     });
-    regionSelect?.addEventListener("change", () => {
+
+    regionSelect.addEventListener("change", () => {
       const cap = state.capacities.find(c => c.id === id);
       if (cap) cap.region = regionSelect.value;
-      updateKPIs();
+      updateCostFromPricing();
     });
-    costInput.addEventListener("input", () => {
+
+    reservationCheckbox.addEventListener("change", () => {
       const cap = state.capacities.find(c => c.id === id);
-      if (cap) cap.monthlyCost = parseInt(costInput.value) || 0;
+      if (cap) cap.hasReservation = reservationCheckbox.checked;
       updateKPIs();
     });
+
     delBtn.addEventListener("click", () => {
       tbody.removeChild(row);
       const idx = state.capacities.findIndex(c => c.id === id);
@@ -312,13 +471,13 @@
 
   // Footer actions
   byId("resetBtn").addEventListener("click", () => {
-    byId("currencySelect").value = "USD";
+    // Currency locked to USD
+    state.currencyCode = "USD";
+    state.currencySymbol = "$";
     byId("viewerCount").value = 0;
     byId("builderCount").value = 0;
     byId("proCost").value = 0;
     byId("recommendationMain").textContent = "";
-    state.currencyCode = "USD";
-    state.currencySymbol = currencyMap["USD"] || "$";
 
     state.capacities = [];
     tbody.innerHTML = "";
@@ -330,7 +489,9 @@
   });
 
   byId("sampleBtn").addEventListener("click", () => {
-    byId("currencySelect").value = "EUR";
+    // Currency locked to USD
+    state.currencyCode = "USD";
+    state.currencySymbol = "$";
     byId("viewerCount").value = 1200;
     byId("builderCount").value = 25;
     byId("proCost").value = 14;
@@ -339,9 +500,9 @@
     state.capacities = [];
     tbody.innerHTML = "";
     
-    // Add sample capacities
-    addCapacityRow("F32", "2640", "North Europe");
-    addCapacityRow("F64", "5280", "North Europe");
+    // Add sample capacities using arm_region_name (e.g., "centralus")
+    addCapacityRow("F32", "", "centralus");
+    addCapacityRow("F64", "", "centralus");
     
     // Read form inputs to update state, then update KPIs
     readInputs();
@@ -354,14 +515,16 @@
 
   // --- Init defaults ---
   // Set form values to match initial state
-  byId("currencySelect").value = state.currencyCode;
+  // Currency locked to USD
   byId("viewerCount").value = state.viewers;
   byId("builderCount").value = state.builders;
   byId("proCost").value = state.proCost;
   
-  addCapacityRow("F32", "2640", "North Europe");
-  addCapacityRow("F64", "5280", "North Europe");
+  // Add initial capacities with pricing lookup using arm_region_name
+  addCapacityRow("F32", "", "centralus");
+  addCapacityRow("F64", "", "centralus");
   updateKPIs();
+  console.log("Fabric PBI Cost Advisor initialized successfully with embedded pricing data");
 
 
   // Get today's date and format it as YYYY-MM-DD
@@ -406,21 +569,30 @@
      const hideProOnly = document.getElementById('hideProOnly').checked;
      const hidePpuOnly = document.getElementById('hidePpuOnly').checked;
      const symbol = '$'; // Fixed to USD
+     const selectedRegionArm = document.getElementById('licenseTableRegion').value;
 
-    // Updated Fabric SKU pricing based on official USD pricing
+    // Get pricing for selected region from fabricPricingData
+    const regionData = fabricPricingData.regions.find(r => r.arm_region_name === selectedRegionArm);
     const fabricSKUs = [
-      { name: 'F8', monthlyCost: 1285, reservationCost: 764, viewerPolicy: 'Pro required', computeUnits: 8 },
-      { name: 'F16', monthlyCost: 2570, reservationCost: 1528, viewerPolicy: 'Pro required', computeUnits: 16 },
-      { name: 'F32', monthlyCost: 5139, reservationCost: 3056, viewerPolicy: 'Pro required', computeUnits: 32 },
-      { name: 'F64', monthlyCost: 10278, reservationCost: 6112, viewerPolicy: 'Free viewers', computeUnits: 64 },
-      { name: 'F128', monthlyCost: 20557, reservationCost: 12224, viewerPolicy: 'Free viewers', computeUnits: 128 },
-      { name: 'F256', monthlyCost: 41114, reservationCost: 24448, viewerPolicy: 'Free viewers', computeUnits: 256 }
-    ].map(sku => ({
-      ...sku,
-      // Use reservation cost if enabled, otherwise use pay-as-you-go cost
-      monthlyCost: reservationDiscount ? sku.reservationCost : sku.monthlyCost,
-      originalCost: sku.monthlyCost
-    }));
+      { name: 'F8', viewerPolicy: 'Pro required', computeUnits: 8 },
+      { name: 'F16', viewerPolicy: 'Pro required', computeUnits: 16 },
+      { name: 'F32', viewerPolicy: 'Pro required', computeUnits: 32 },
+      { name: 'F64', viewerPolicy: 'Free viewers', computeUnits: 64 },
+      { name: 'F128', viewerPolicy: 'Free viewers', computeUnits: 128 },
+      { name: 'F256', viewerPolicy: 'Free viewers', computeUnits: 256 }
+    ].map(sku => {
+      if (!regionData) {
+        return { ...sku, monthlyCost: 0, originalCost: 0 };
+      }
+      const skuData = regionData.capacity_skus?.find(s => s.sku === sku.name);
+      const paygCost = skuData?.payg_monthly_usd || 0;
+      const reservationCost = paygCost * 0.59; // 41% discount = 59% of PAYG
+      return {
+        ...sku,
+        monthlyCost: reservationDiscount ? reservationCost : paygCost,
+        originalCost: paygCost
+      };
+    });
 
     // Get custom scenario from sliders
     const viewersCount = parseInt(document.getElementById('viewersSlider').value);
@@ -531,9 +703,17 @@
   }
 
   // Initialize tabs
+  // Initialize license table region dropdown
+  function initLicenseTableRegionDropdown() {
+    const regionSelect = document.getElementById('licenseTableRegion');
+    regionSelect.innerHTML = buildGroupedRegionOptions('westeurope');
+  }
+  
   initTabs();
+  initLicenseTableRegionDropdown();
   
   // Add event listeners for license table inputs
+  document.getElementById('licenseTableRegion').addEventListener('change', generateLicenseImpactTable);
   document.getElementById('licenseTableProCost').addEventListener('input', generateLicenseImpactTable);
   document.getElementById('licenseTablePpuCost').addEventListener('input', generateLicenseImpactTable);
   document.getElementById('reservationDiscount').addEventListener('change', generateLicenseImpactTable);
