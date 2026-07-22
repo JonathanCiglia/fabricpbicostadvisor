@@ -34,6 +34,37 @@
   });
 })();
 
+(() => {
+  const btn = document.getElementById('toggleHeaderDetails');
+  const details = document.getElementById('headerDetails');
+  if (!btn || !details) return;
+
+  const KEY_HEADER_COLLAPSED = 'advisor-header:collapsed';
+
+  const setCollapsed = (collapsed) => {
+    details.hidden = collapsed;
+    btn.textContent = collapsed ? '▸' : '▾';
+    btn.setAttribute('aria-label', collapsed ? 'Show context' : 'Hide context');
+    btn.setAttribute('title', collapsed ? 'Show context' : 'Hide context');
+    btn.setAttribute('aria-expanded', String(!collapsed));
+  };
+
+  let collapsed = true;
+  try {
+    const stored = localStorage.getItem(KEY_HEADER_COLLAPSED);
+    if (stored === '0') collapsed = false;
+    if (stored === '1') collapsed = true;
+  } catch {}
+
+  setCollapsed(collapsed);
+
+  btn.addEventListener('click', () => {
+    collapsed = !collapsed;
+    setCollapsed(collapsed);
+    try { localStorage.setItem(KEY_HEADER_COLLAPSED, collapsed ? '1' : '0'); } catch {}
+  });
+})();
+
 
   // --- Pricing Data (Embedded) ---
   const fabricPricingData = {
@@ -193,9 +224,12 @@
   const state = {
     currencyCode: "USD",
     currencySymbol: "$",
-    viewers: 300,
-    builders: 30,
     proCost: 14,
+    audienceMode: "global", // global | perInstance
+    globalViewers: 300,
+    globalBuilders: 30,
+    defaultViewersPerInstance: 300,
+    defaultBuildersPerInstance: 30,
     capacities: [], // { id, name, region, monthlyCost }
     maxInstances: 4
   };
@@ -310,7 +344,15 @@
   }
 
   function computePpuOnly() {
-    const totalUsers = state.viewers + state.builders;
+    const scopedCaps = state.capacities
+      .slice(0, state.maxInstances)
+      .filter(c => Boolean(c.region));
+    const totalUsers = state.audienceMode === "global"
+      ? (scopedCaps.length > 0 ? ((Number(state.globalViewers) || 0) + (Number(state.globalBuilders) || 0)) : 0)
+      : scopedCaps.reduce(
+          (sum, c) => sum + (Number(c.viewers) || 0) + (Number(c.builders) || 0),
+          0
+        );
     const total = totalUsers * state.proCost;
     return { total, detail: `${totalUsers} × PPU @ ${money(state.proCost)}` };
   }
@@ -323,13 +365,21 @@
         const vUnit = viewerUnitCost(c.name);
         // Use reservation price if enabled, otherwise PAYG price
         let cap = c.monthlyCost || 0;
-        const buildersCost = state.builders * state.proCost;
-        const viewersCost = state.viewers * vUnit;
+        const buildersCount = state.audienceMode === "global"
+          ? (Number(state.globalBuilders) || 0)
+          : (Number(c.builders) || 0);
+        const viewersCount = state.audienceMode === "global"
+          ? (Number(state.globalViewers) || 0)
+          : (Number(c.viewers) || 0);
+        const buildersCost = buildersCount * state.proCost;
+        const viewersCost = viewersCount * vUnit;
         const total = cap + buildersCost + viewersCost;
         return {
           id: c.id,
           name: c.name || "(unnamed)",
           region: c.region || "",
+          viewers: viewersCount,
+          builders: buildersCount,
           monthlyCost: cap,
           originalMonthlyCost: c.monthlyCost || 0,
           hasReservation: c.hasReservation,
@@ -350,13 +400,16 @@
         label: c.region ? `${c.name} — ${c.region}` : c.name,
         policy: c.viewerUnitCost === 0 ? "Free viewers" : "Viewers & builders require Pro ",
         capCost: c.monthlyCost,
+        hasReservation: c.hasReservation,
         buildersCost: c.buildersCost,
         viewersCost: c.viewersCost,
         total: c.total
       }))
     ];
 
-    const bestRow = allRows.reduce((a, b) => (b.total < a.total ? b : a), allRows[0]);
+    const bestRow = state.audienceMode === "global"
+      ? allRows.reduce((a, b) => (b.total < a.total ? b : a), allRows[0])
+      : null;
 
     const tbl = document.createElement("table");
     tbl.className = "table";
@@ -364,7 +417,7 @@
       <thead>
         <tr>
           <th>Scenario</th>
-          <th>Viewer Policy</th>
+          <th>License Policy</th>
           <th class="right">Capacity</th>
           <th class="right">Builders</th>
           <th class="right">Viewers</th>
@@ -377,12 +430,14 @@
 
     allRows.forEach(row => {
       const tr = document.createElement("tr");
-      if (row === bestRow) tr.classList.add("best-row");
-      const delta = row.total - ppuOnly.total;
+      if (bestRow && row === bestRow) tr.classList.add("best-row");
+      const reservationBadge = row.hasReservation
+        ? ' <span style="color: #22c55e; font-size: 10px; font-weight: 700;">(~41% off)</span>'
+        : "";
       tr.innerHTML = `
-        <td>${row.label} ${row === bestRow ? `<span class="best-badge">Best</span>` : ""}</td>
+        <td>${row.label} ${bestRow && row === bestRow ? `<span class="best-badge">Best</span>` : ""}</td>
         <td>${row.policy}</td>
-        <td class="right">${money(row.capCost)}</td>
+        <td class="right">${money(row.capCost)}${reservationBadge}</td>
         <td class="right">${money(row.buildersCost)}</td>
         <td class="right">${money(row.viewersCost)}</td>
         <td class="right"><strong>${money(row.total)}</strong></td>
@@ -390,10 +445,47 @@
       tbody.appendChild(tr);
     });
 
+    if (allRows.length > 1) {
+      const totals = allRows.reduce((acc, row) => ({
+        capCost: acc.capCost + (row.capCost || 0),
+        buildersCost: acc.buildersCost + (row.buildersCost || 0),
+        viewersCost: acc.viewersCost + (row.viewersCost || 0),
+        total: acc.total + (row.total || 0)
+      }), { capCost: 0, buildersCost: 0, viewersCost: 0, total: 0 });
+
+      if (state.audienceMode === "global") {
+        const maxBuilders = Math.max(...allRows.map(r => r.buildersCost || 0));
+        const maxViewers = Math.max(...allRows.map(r => r.viewersCost || 0));
+        totals.buildersCost = maxBuilders;
+        totals.viewersCost = maxViewers;
+        totals.total = totals.capCost + maxBuilders + maxViewers;
+      }
+
+      const totalRow = document.createElement("tr");
+      totalRow.innerHTML = `
+        <td><strong>Total</strong></td>
+        <td>—</td>
+        <td class="right"><strong>${money(totals.capCost)}</strong></td>
+        <td class="right"><strong>${money(totals.buildersCost)}</strong></td>
+        <td class="right"><strong>${money(totals.viewersCost)}</strong></td>
+        <td class="right"><strong>${money(totals.total)}</strong></td>
+      `;
+      tbody.appendChild(totalRow);
+    }
+
     wrap.appendChild(tbl);
   }
 
   function updateRecommendation(caps, ppuOnly) {
+    const recEl = byId("recommendation");
+    if (state.audienceMode === "perInstance") {
+      recEl.classList.add("rec--muted");
+      byId("recommendationMain").textContent = 'Select "Same for all instances" to see a recommendation';
+      byId("recommendationNote").textContent = "";
+      return;
+    }
+
+    recEl.classList.remove("rec--muted");
     const candidates = [...caps.map(x => ({
       label: x.region ? `${x.name} — ${x.region}` : `${x.name}`,
       total: x.total
@@ -401,6 +493,7 @@
     const best = candidates.length > 0 ? candidates.reduce((a, b) => (b.total < a.total ? b : a)) : undefined;
     const worst = candidates.length > 0 ? candidates.reduce((a, b) => (b.total > a.total ? b : a)) : undefined;
     byId("recommendationMain").textContent = best ? `${best.label} — ${money(best.total * 12)} / year` : 'Add capacities to see a recommendation';
+    byId("recommendationNote").textContent = "";
   }
 
   function updateKPIs() {
@@ -425,12 +518,10 @@
     // Currency locked to USD
     state.currencyCode = "USD";
     state.currencySymbol = "$";
-    state.viewers = Number(byId("viewerCount").value) || 0;
-    state.builders = Number(byId("builderCount").value) || 0;
     state.proCost = Number(byId("proCost").value) || 0;
     updateKPIs();
   }
-  ["viewerCount","builderCount","proCost"]
+  ["proCost"]
     .forEach(id => byId(id).addEventListener("input", readInputs));
 
   const tbody = byId("capacityTbody");
@@ -441,7 +532,57 @@
     addBtn.disabled = state.capacities.length >= state.maxInstances;
   }
 
-  function addCapacityRow(name = "", monthlyCost = "", region = "") {
+  function refreshAudienceModeUI() {
+    const sharedBox = byId("sharedAudienceControls");
+    if (sharedBox) {
+      sharedBox.style.display = state.audienceMode === "global" ? "block" : "none";
+    }
+
+    const recommendation = byId("recommendation");
+    if (recommendation) recommendation.style.display = "block";
+
+    const globalRadio = byId("audienceModeGlobal");
+    const perInstanceRadio = byId("audienceModePerInstance");
+    if (globalRadio) globalRadio.checked = state.audienceMode === "global";
+    if (perInstanceRadio) perInstanceRadio.checked = state.audienceMode === "perInstance";
+
+    const controlsRows = tbody.querySelectorAll('tr[data-role="instance-controls"]');
+    controlsRows.forEach(r => {
+      r.style.display = state.audienceMode === "perInstance" ? "table-row" : "none";
+    });
+
+    const badges = tbody.querySelectorAll('[data-role="audience-badge"]');
+    badges.forEach(b => {
+      const capId = Number(b.getAttribute("data-cap-id"));
+      const cap = state.capacities.find(c => c.id === capId);
+      if (!cap) return;
+      if (state.audienceMode === "global") {
+        b.textContent = "";
+        b.style.display = "none";
+      } else {
+        b.textContent = "";
+        b.style.display = "none";
+      }
+    });
+  }
+
+  function applyAudienceMode(newMode) {
+    if (newMode === state.audienceMode) return;
+
+    if (newMode === "perInstance") {
+      // Seamless switch: copy shared values into all rows so totals remain consistent.
+      state.capacities.forEach(c => {
+        c.viewers = Number(state.globalViewers) || 0;
+        c.builders = Number(state.globalBuilders) || 0;
+      });
+    }
+
+    state.audienceMode = newMode;
+    refreshAudienceModeUI();
+    updateKPIs();
+  }
+
+  function addCapacityRow(name = "", monthlyCost = "", region = "", viewers = null, builders = null) {
     if (state.capacities.length >= state.maxInstances) {
       updateAddButtonState();
       updateKPIs();
@@ -457,10 +598,17 @@
     ).join("");
 
     const initialRegion = (typeof region === "string" ? region : "").trim();
+    const hasInitialViewers = viewers !== null && viewers !== undefined && viewers !== "";
+    const hasInitialBuilders = builders !== null && builders !== undefined && builders !== "";
+    const initialViewers = hasInitialViewers ? Number(viewers) : state.defaultViewersPerInstance;
+    const initialBuilders = hasInitialBuilders ? Number(builders) : state.defaultBuildersPerInstance;
 
     const id = capIdCounter++;
     const row = document.createElement("tr");
     row.dataset.id = id;
+    const controlsRow = document.createElement("tr");
+    controlsRow.dataset.id = id;
+    controlsRow.dataset.role = "instance-controls";
 
     // Calculate initial cost and reservation price
     let initialCost = monthlyCost;
@@ -477,6 +625,8 @@
       id, 
       name: selectedSKU, 
       region: initialRegion, 
+      viewers: initialViewers,
+      builders: initialBuilders,
       monthlyCost: Number(initialCost) || 0,
       paygMonthly: Number(initialCost) || 0,
       reservationMonthly: reservationPrice || 0,
@@ -489,17 +639,71 @@
       </td>
       <td>
         <select data-role="region">${buildGroupedRegionOptions(initialRegion)}</select>
+        <div data-role="audience-badge" data-cap-id="${id}" class="muted" style="margin-top: 6px; font-size: 12px;"></div>
       </td>
-      <td><input type="text" readonly tabindex="-1" value="${Math.round(Number(initialCost) || 0).toLocaleString()}" data-role="cost" style="text-align:right; background: #0d1727; color: #94a3b8; cursor: default; border-color: #1f2937; pointer-events: none;" /></td>
+      <td><input type="text" readonly tabindex="-1" title="PAYG price" value="${Math.round(Number(initialCost) || 0).toLocaleString()}" data-role="cost" style="text-align:right; background: #0d1727; color: #94a3b8; cursor: help; border-color: #1f2937;" /></td>
       <td style="text-align:center;"><input type="checkbox" data-role="reservation" style="width: 18px; height: 18px; cursor: pointer; accent-color: #10b981;" /></td>
       <td class="right"><button class="del" style="padding: 4px 8px; font-size: 16px; min-width: 24px;">−</button></td>
     `;
 
+    controlsRow.innerHTML = `
+      <td colspan="5" style="padding: 8px 10px 12px 10px; background: rgba(15, 23, 42, 0.35); border-bottom: 1px solid var(--border);">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+          <div class="slider-field" style="margin:0;">
+            <label class="slider-label" style="margin-bottom:6px;">Viewers</label>
+            <div style="display:grid; grid-template-columns: minmax(130px,1fr) 72px; gap:8px; align-items:center;">
+              <input class="range-slider" type="range" data-role="viewers-slider" min="0" max="2000" step="1" value="${initialViewers}" style="--slider-accent:#60a5fa; --slider-accent-strong:#2563eb;" />
+              <input type="number" data-role="viewers-count" min="0" max="2000" value="${initialViewers}" aria-label="Viewers for this instance" style="padding:6px 8px; font-size:13px; text-align:center;" />
+            </div>
+          </div>
+          <div class="slider-field slider-field--green" style="margin:0;">
+            <label class="slider-label" style="margin-bottom:6px;">Builders</label>
+            <div style="display:grid; grid-template-columns: minmax(130px,1fr) 72px; gap:8px; align-items:center;">
+              <input class="range-slider" type="range" data-role="builders-slider" min="0" max="200" step="5" value="${initialBuilders}" style="--slider-accent:#34d399; --slider-accent-strong:#059669;" />
+              <input type="number" data-role="builders-count" min="0" max="200" value="${initialBuilders}" aria-label="Builders for this instance" style="padding:6px 8px; font-size:13px; text-align:center;" />
+            </div>
+          </div>
+        </div>
+      </td>
+    `;
+
     const skuSelect = row.querySelector("select");
     const regionSelect = row.querySelector('select[data-role="region"]');
+    const viewersSliderInput = controlsRow.querySelector('input[data-role="viewers-slider"]');
+    const viewersCountInput = controlsRow.querySelector('input[data-role="viewers-count"]');
+    const buildersSliderInput = controlsRow.querySelector('input[data-role="builders-slider"]');
+    const buildersCountInput = controlsRow.querySelector('input[data-role="builders-count"]');
     const costInput = row.querySelector('input[data-role="cost"]');
     const reservationCheckbox = row.querySelector('input[data-role="reservation"]');
     const delBtn = row.querySelector("button.del");
+
+    if (viewersSliderInput) updateRangeFill(viewersSliderInput);
+    if (buildersSliderInput) updateRangeFill(buildersSliderInput);
+
+    const syncViewers = (rawVal) => {
+      const cap = state.capacities.find(c => c.id === id);
+      const val = Math.min(Math.max(Number(rawVal) || 0, 0), 2000);
+      viewersCountInput.value = val;
+      viewersSliderInput.value = val;
+      updateRangeFill(viewersSliderInput);
+      if (cap) cap.viewers = val;
+      updateKPIs();
+    };
+
+    const syncBuilders = (rawVal) => {
+      const cap = state.capacities.find(c => c.id === id);
+      const val = Math.min(Math.max(Number(rawVal) || 0, 0), 200);
+      buildersCountInput.value = val;
+      buildersSliderInput.value = val;
+      updateRangeFill(buildersSliderInput);
+      if (cap) cap.builders = val;
+      updateKPIs();
+    };
+
+    viewersSliderInput.addEventListener("input", () => syncViewers(viewersSliderInput.value));
+    viewersCountInput.addEventListener("input", () => syncViewers(viewersCountInput.value));
+    buildersSliderInput.addEventListener("input", () => syncBuilders(buildersSliderInput.value));
+    buildersCountInput.addEventListener("input", () => syncBuilders(buildersCountInput.value));
 
 
 
@@ -510,6 +714,7 @@
 
       if (!currentRegion) {
         costInput.value = "0";
+        costInput.title = "PAYG price";
         if (cap) {
           cap.monthlyCost = 0;
           cap.paygMonthly = 0;
@@ -538,10 +743,11 @@
           if (cap) {
             cap.paygMonthly = pricing.payg_monthly_usd;
             cap.reservationMonthly = pricing.reservation_1yr_monthly_usd;
-            // Display the appropriate cost based on reservation checkbox
+            // Reservation affects scenario totals, not the base cost display column.
             cap.monthlyCost = reservationCheckbox.checked ? pricing.reservation_1yr_monthly_usd : pricing.payg_monthly_usd;
           }
-          costInput.value = Math.round(cap.monthlyCost).toLocaleString();
+          costInput.value = Math.round(pricing.payg_monthly_usd).toLocaleString();
+          costInput.title = "PAYG price";
           updateKPIs();
           return;
         }
@@ -571,13 +777,15 @@
           cap.monthlyCost = cap.paygMonthly;
           cap.hasReservation = false;
         }
-        costInput.value = Math.round(cap.monthlyCost).toLocaleString();
+        costInput.value = Math.round(cap.paygMonthly || 0).toLocaleString();
+        costInput.title = "PAYG price";
       }
       updateKPIs();
     });
 
     delBtn.addEventListener("click", () => {
       tbody.removeChild(row);
+      tbody.removeChild(controlsRow);
       const idx = state.capacities.findIndex(c => c.id === id);
       if (idx >= 0) state.capacities.splice(idx, 1);
       updateAddButtonState();
@@ -585,7 +793,9 @@
     });
 
     tbody.appendChild(row);
+    tbody.appendChild(controlsRow);
     updateAddButtonState();
+    refreshAudienceModeUI();
     updateKPIs();
   }
   
@@ -596,21 +806,25 @@
     // Currency locked to USD
     state.currencyCode = "USD";
     state.currencySymbol = "$";
-    byId("viewerCount").value = 0;
-    byId("builderCount").value = 0;
-    byId("proCost").value = 0;
-    if (viewerSlider) {
-      viewerSlider.value = 0;
-      updateRangeFill(viewerSlider);
+    byId("proCost").value = 14;
+    state.audienceMode = "global";
+    state.globalViewers = state.defaultViewersPerInstance;
+    state.globalBuilders = state.defaultBuildersPerInstance;
+    if (byId("globalViewerCount")) byId("globalViewerCount").value = state.globalViewers;
+    if (byId("globalBuilderCount")) byId("globalBuilderCount").value = state.globalBuilders;
+    if (byId("globalViewerSlider")) {
+      byId("globalViewerSlider").value = state.globalViewers;
+      updateRangeFill(byId("globalViewerSlider"));
     }
-    if (builderSlider) {
-      builderSlider.value = 0;
-      updateRangeFill(builderSlider);
+    if (byId("globalBuilderSlider")) {
+      byId("globalBuilderSlider").value = state.globalBuilders;
+      updateRangeFill(byId("globalBuilderSlider"));
     }
     byId("recommendationMain").textContent = "";
 
     state.capacities = [];
     tbody.innerHTML = "";
+    refreshAudienceModeUI();
     updateKPIs();
 
     // Ensure baseline hidden again
@@ -618,40 +832,89 @@
     if (!box.classList.contains("hide")) box.classList.add("hide");
   });
 
-  byId("sampleBtn").addEventListener("click", () => {
-    // Currency locked to USD
-    state.currencyCode = "USD";
-    state.currencySymbol = "$";
-    byId("viewerCount").value = 1200;
-    byId("builderCount").value = 25;
-    byId("proCost").value = 14;
-    if (viewerSlider) {
-      viewerSlider.value = 1200;
-      updateRangeFill(viewerSlider);
-    }
-    if (builderSlider) {
-      builderSlider.value = 25;
-      updateRangeFill(builderSlider);
+  byId("printBtn").addEventListener("click", () => {
+    // --- Prepare document for PDF-friendly output ---
+    document.body.classList.add("printing");
+
+    // Snapshot interactive controls into static text
+    const snapshots = [];
+
+    // Build a clean parameters summary to replace the inputs card
+    const inputsCard = document.querySelector('#estimator-tab .card');
+    if (inputsCard) {
+      const mode = state.audienceMode === "global" ? "Same for all instances" : "Per instance";
+      const proCost = Number(byId("proCost").value) || 0;
+      const viewers = state.audienceMode === "global"
+        ? (Number(state.globalViewers) || 0)
+        : state.capacities.filter(c => Boolean(c.region)).map(c => `${c.name || '?'}: ${c.viewers || 0}`).join(', ');
+      const builders = state.audienceMode === "global"
+        ? (Number(state.globalBuilders) || 0)
+        : state.capacities.filter(c => Boolean(c.region)).map(c => `${c.name || '?'}: ${c.builders || 0}`).join(', ');
+
+      const summary = document.createElement('div');
+      summary.className = 'print-params-summary';
+      summary.innerHTML = `
+        <h2 style="font-size:13pt;font-weight:700;border-bottom:1px solid #ddd;padding-bottom:4px;margin:0 0 10px;color:#1a1a1a;">Parameters</h2>
+        <div class="print-params-grid">
+          <div class="print-param"><span class="print-param-label">Pro license cost</span><span class="print-param-value">$${proCost}/user/month</span></div>
+          <div class="print-param"><span class="print-param-label">Audience mode</span><span class="print-param-value">${mode}</span></div>
+          <div class="print-param"><span class="print-param-label">Builders</span><span class="print-param-value">${builders}</span></div>
+          <div class="print-param"><span class="print-param-label">Viewers</span><span class="print-param-value">${viewers}</span></div>
+        </div>
+      `;
+      inputsCard.style.display = 'none';
+      inputsCard.parentNode.insertBefore(summary, inputsCard);
+      snapshots.push(() => { summary.remove(); inputsCard.style.display = ''; });
     }
 
-    // Clear existing capacities
-    state.capacities = [];
-    tbody.innerHTML = "";
-    
-    // Add sample capacities using arm_region_name (e.g., "centralus")
-    addCapacityRow("F32", "", "centralus");
-    addCapacityRow("F64", "", "centralus");
-    
-    // Read form inputs to update state, then update KPIs
-    readInputs();
+    // Replace select dropdowns with their selected text (for capacity table in results card)
+    document.querySelectorAll('#licenseTableRegion').forEach(sel => {
+      const text = sel.options[sel.selectedIndex]?.text || sel.value;
+      const span = document.createElement('span');
+      span.className = 'print-static-value';
+      span.textContent = text;
+      sel.parentNode.insertBefore(span, sel);
+      sel.style.display = 'none';
+      snapshots.push(() => { span.remove(); sel.style.display = ''; });
+    });
 
-    const box = byId("baselineBox");
-    if (!box.classList.contains("hide")) box.classList.add("hide");
+    // Replace number inputs in licensing tab
+    document.querySelectorAll('#licenseTableProCost, #licenseTablePpuCost').forEach(inp => {
+      if (inp.offsetParent === null) return;
+      const span = document.createElement('span');
+      span.className = 'print-static-value';
+      span.textContent = inp.value;
+      inp.parentNode.insertBefore(span, inp);
+      inp.style.display = 'none';
+      snapshots.push(() => { span.remove(); inp.style.display = ''; });
+    });
+
+    // Show header details for context
+    const headerDetails = byId("headerDetails");
+    const wasHidden = headerDetails.hidden;
+    headerDetails.hidden = false;
+
+    // Show custom notes if user entered any
+    const noteTextarea = document.querySelector('.note-input');
+    const noteText = (noteTextarea ? noteTextarea.value.trim() : '');
+    let notesBlock = null;
+    if (noteText) {
+      notesBlock = document.createElement('div');
+      notesBlock.className = 'print-notes-block';
+      notesBlock.innerHTML = `<h3 class="print-notes-title">Notes</h3><div class="print-notes-content">${noteText.replace(/\n/g, '<br>')}</div>`;
+      document.querySelector('#estimator-tab main')?.appendChild(notesBlock);
+    }
+
+    window.print();
+
+    // --- Restore everything ---
+    document.body.classList.remove("printing");
+    headerDetails.hidden = wasHidden;
+    if (notesBlock) notesBlock.remove();
+    snapshots.forEach(fn => fn());
   });
 
-  byId("printBtn").addEventListener("click", () => window.print());
-
-  // --- Cost Estimator Sliders Sync ---
+  // --- Shared slider fill helper ---
   function updateRangeFill(slider) {
     const min = Number(slider.min) || 0;
     const max = Number(slider.max) || 100;
@@ -659,67 +922,78 @@
     slider.style.setProperty("--range-progress", `${progress}%`);
   }
 
-  const viewerSlider = byId("viewerSliderEstimator") || null;
-  const builderSlider = byId("builderSliderEstimator") || null;
+  const globalViewerSlider = byId("globalViewerSlider") || null;
+  const globalViewerCount = byId("globalViewerCount") || null;
+  const globalBuilderSlider = byId("globalBuilderSlider") || null;
+  const globalBuilderCount = byId("globalBuilderCount") || null;
 
-  // Sync slider to inputs and trigger calculation
-  if (viewerSlider) {
-    viewerSlider.addEventListener("input", () => {
-      byId("viewerCount").value = viewerSlider.value;
-      updateRangeFill(viewerSlider);
-      readInputs();
-    });
+  const syncGlobalViewers = (rawVal) => {
+    const val = Math.min(Math.max(Number(rawVal) || 0, 0), 2000);
+    state.globalViewers = val;
+    if (globalViewerCount) globalViewerCount.value = val;
+    if (globalViewerSlider) {
+      globalViewerSlider.value = val;
+      updateRangeFill(globalViewerSlider);
+    }
+    refreshAudienceModeUI();
+    if (state.audienceMode === "global") updateKPIs();
+  };
+
+  const syncGlobalBuilders = (rawVal) => {
+    const val = Math.min(Math.max(Number(rawVal) || 0, 0), 200);
+    state.globalBuilders = val;
+    if (globalBuilderCount) globalBuilderCount.value = val;
+    if (globalBuilderSlider) {
+      globalBuilderSlider.value = val;
+      updateRangeFill(globalBuilderSlider);
+    }
+    refreshAudienceModeUI();
+    if (state.audienceMode === "global") updateKPIs();
+  };
+
+  if (globalViewerSlider) {
+    globalViewerSlider.addEventListener("input", () => syncGlobalViewers(globalViewerSlider.value));
+  }
+  if (globalViewerCount) {
+    globalViewerCount.addEventListener("input", () => syncGlobalViewers(globalViewerCount.value));
+  }
+  if (globalBuilderSlider) {
+    globalBuilderSlider.addEventListener("input", () => syncGlobalBuilders(globalBuilderSlider.value));
+  }
+  if (globalBuilderCount) {
+    globalBuilderCount.addEventListener("input", () => syncGlobalBuilders(globalBuilderCount.value));
   }
 
-  if (builderSlider) {
-    builderSlider.addEventListener("input", () => {
-      byId("builderCount").value = builderSlider.value;
-      updateRangeFill(builderSlider);
-      readInputs();
+  if (byId("audienceModeGlobal")) {
+    byId("audienceModeGlobal").addEventListener("change", () => {
+      if (byId("audienceModeGlobal").checked) applyAudienceMode("global");
     });
   }
-
-  // Sync number inputs to sliders and trigger calculation
-  byId("viewerCount").addEventListener("input", () => {
-    const val = Math.min(Math.max(Number(byId("viewerCount").value) || 0, 0), 2000);
-    byId("viewerCount").value = val;
-    if (viewerSlider) {
-      viewerSlider.value = val;
-      updateRangeFill(viewerSlider);
-    }
-    readInputs();
-  });
-
-  byId("builderCount").addEventListener("input", () => {
-    const val = Math.min(Math.max(Number(byId("builderCount").value) || 0, 0), 200);
-    byId("builderCount").value = val;
-    if (builderSlider) {
-      builderSlider.value = val;
-      updateRangeFill(builderSlider);
-    }
-    readInputs();
-  });
+  if (byId("audienceModePerInstance")) {
+    byId("audienceModePerInstance").addEventListener("change", () => {
+      if (byId("audienceModePerInstance").checked) applyAudienceMode("perInstance");
+    });
+  }
 
   // --- Init defaults ---
   // Set form values to match initial state
   // Currency locked to USD
-  byId("viewerCount").value = state.viewers;
-  byId("builderCount").value = state.builders;
   byId("proCost").value = state.proCost;
-  
-  // Initialize sliders
-  if (viewerSlider) {
-    viewerSlider.value = state.viewers;
-    updateRangeFill(viewerSlider);
+  if (globalViewerCount) globalViewerCount.value = state.globalViewers;
+  if (globalBuilderCount) globalBuilderCount.value = state.globalBuilders;
+  if (globalViewerSlider) {
+    globalViewerSlider.value = state.globalViewers;
+    updateRangeFill(globalViewerSlider);
   }
-  if (builderSlider) {
-    builderSlider.value = state.builders;
-    updateRangeFill(builderSlider);
+  if (globalBuilderSlider) {
+    globalBuilderSlider.value = state.globalBuilders;
+    updateRangeFill(globalBuilderSlider);
   }
   
   // Add initial capacities with pricing lookup using arm_region_name
   addCapacityRow("F32", "", "centralus");
   addCapacityRow("F64", "", "centralus");
+  refreshAudienceModeUI();
   updateKPIs();
   console.log("Fabric PBI Cost Advisor initialized successfully with embedded pricing data");
 
