@@ -1008,25 +1008,37 @@
   function initTabs() {
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabPanels = document.querySelectorAll('.tab-panel');
+    const validTabs = new Set(Array.from(tabButtons, button => button.dataset.tab));
+
+    function setActiveTab(targetTab) {
+      const activeTab = validTabs.has(targetTab) ? targetTab : 'estimator';
+
+      // Remove active class from all buttons and panels
+      tabButtons.forEach(button => {
+        button.classList.toggle('active', button.dataset.tab === activeTab);
+      });
+      tabPanels.forEach(panel => {
+        panel.classList.toggle('active', panel.id === `${activeTab}-tab`);
+      });
+
+      // Generate license impact table when switching to licensing tab
+      if (activeTab === 'licensing') {
+        generateLicenseImpactTable();
+      }
+    }
 
     tabButtons.forEach(button => {
       button.addEventListener('click', () => {
         const targetTab = button.dataset.tab;
-        
-        // Remove active class from all buttons and panels
-        tabButtons.forEach(btn => btn.classList.remove('active'));
-        tabPanels.forEach(panel => panel.classList.remove('active'));
-        
-        // Add active class to clicked button and corresponding panel
-        button.classList.add('active');
-        document.getElementById(`${targetTab}-tab`).classList.add('active');
-        
-        // Generate license impact table when switching to licensing tab
-        if (targetTab === 'licensing') {
-          generateLicenseImpactTable();
-        }
+        window.location.hash = targetTab;
       });
     });
+
+    window.addEventListener('hashchange', () => {
+      setActiveTab(window.location.hash.slice(1));
+    });
+
+    setActiveTab(window.location.hash.slice(1));
   }
 
   // === LICENSE IMPACT TABLE ===
